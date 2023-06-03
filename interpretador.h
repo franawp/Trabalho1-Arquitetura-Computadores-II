@@ -1,6 +1,8 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+map<string,int> umHash;
+
 /* Implementar o interpretador */
 
 bitset<32> interpretarInstrucao (string instrucao) {
