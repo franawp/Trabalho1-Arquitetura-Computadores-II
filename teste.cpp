@@ -3,7 +3,15 @@ using namespace std;
 
 int main () {
     bitset<32> numero = 0b11;
-    cout << numero;
+    int numero2 = 0b11;
+
+    if (numero == numero2) {
+        cout << "igual";
+    }
+    else {
+        cout << "diferente";
+    }
+    //cout << numero;
     return 0;
 }
 
