@@ -14,6 +14,18 @@ vector<string> instrucoes_validas = {
 vector<string> warning;
 vector<string> errors;
 
+bool possuiComentario (string instrucao) {
+    return find(instrucao.begin(),instrucao.end(),"#") != instrucao.end();
+}
+
+string separarComentario (string instrucao) {
+    
+}
+
+vector<string> splitarInstrucoes (vector<string> instrucoes ) {
+
+}
+
 tupla_endereco_instrucao* compliar_instrucao (vector<string> instrucoes, unsigned quantidadeInstrucoes) {
     tupla_endereco_instrucao* instrucoes_compiladas = new tupla_endereco_instrucao[quantidadeInstrucoes];
     unsigned acumulador_posicao_memoria;

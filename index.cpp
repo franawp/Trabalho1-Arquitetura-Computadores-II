@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
 #include <interpretador.h>
-//include <memoria.h>
+#include <memoria.h>
 //#include <instructionFeatch.h>
 using namespace std;
 
@@ -8,6 +8,19 @@ struct Exception {
     string mensagens;
     int codigo;
 };
+
+Memoria *umaMemoria = new Memoria ();
+unsigned contadorPC = 0;
+
+
+
+bitset<32> instructionFeatch (unsigned endereco) {
+    contadorPC++;
+    return umaMemoria->getInstrucao(endereco);
+}
+
+
+
 
 void coletarInstrucoesArquivo () {
 
@@ -43,6 +56,7 @@ void coletarInstrucoesTerminal (vector<pair<int,string>> listaInstrucoes) {
 int main () {
     vector<pair<int,string>> listaInstrucoes;
 
+
     coletarInstrucoesTerminal(listaInstrucoes);
 
     for (pair<int,string> umaInstrucao : listaInstrucoes) {
@@ -68,6 +82,9 @@ int main () {
 
             /* Verificar novamente e interpretar */
         }
+        /* Bloco IF */
+        bitset<32> instrucao = umaMemoria->getInstrucao(4);
+        contadorPC++;
     }
 
     return 0;

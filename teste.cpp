@@ -1,22 +1,58 @@
-#include <iostream>
-#include <chrono>
-#include <thread>
+#include <bits/stdc++.h>
+using namespace std;
 
+int main () {
+    bitset<32> numero = 0b11;
+    cout << numero;
+    return 0;
+}
+
+/*
+int main () {
+    vector<string> instrucoes = {
+        "add r3, r2, r1",
+        "sub r3, r2, r1"
+    };
+    vector<string> instrucoes_splitadas;
+
+    for (const string& instrucao : instrucoes) {
+        istringstream splitar_instrucao(instrucao);
+
+        string string_auxiliar;
+        vector<string> instrucoes_splitadas;
+
+        while (splitar_instrucao >> string_auxiliar) {
+            instrucoes_splitadas.push_back(string_auxiliar);
+        }
+
+        for (string& temp : instrucoes_splitadas) {
+            auto posicaoVirgula = find(temp.begin(), temp.end(), ',');
+            if (posicaoVirgula != temp.end()) {
+                temp.erase(posicaoVirgula);
+            }
+            cout << temp << endl;
+        }
+    }
+
+    return 0;
+}
+*/
+/* 
 void loadingBar(int progress, int total, int barWidth) {
     float percent = static_cast<float>(progress) / total;
     int numChars = static_cast<int>(percent * barWidth);
 
-    std::cout << "[";
+    cout << "[";
     for (int i = 0; i < barWidth; ++i) {
         if (i < numChars)
-            std::cout << "=";
+            cout << "=";
         else if (i == numChars)
-            std::cout << ">";
+            cout << ">";
         else
-            std::cout << " ";
+            cout << " ";
     }
-    std::cout << "] " << static_cast<int>(percent * 100.0) << "%\r";
-    std::cout.flush();
+    cout << "] " << static_cast<int>(percent * 100.0) << "%\r";
+    cout.flush();
 }
 
 int main() {
@@ -25,10 +61,11 @@ int main() {
 
     for (int i = 0; i <= total; ++i) {
         loadingBar(i, total, barWidth);
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        this_thread::sleep_for(chrono::milliseconds(100));
     }
 
-    std::cout << std::endl << "Concluído!" << std::endl;
+    cout << endl << "Concluído!" << endl;
 
     return 0;
 }
+*/
