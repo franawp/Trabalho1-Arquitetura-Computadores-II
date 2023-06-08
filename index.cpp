@@ -10,6 +10,19 @@ struct Exception {
     int codigo;
 };
 
+struct Flags {
+    bitset<8>* opcode;
+    bitset<8>* registradorA;
+    bitset<8>* registradorB;
+    bitset<8>* registradorC;
+    bool overflow;
+    bool neg;
+    bool zero;
+    bool carry;
+    bool memRead;
+    bool memWrite;
+};
+
 class App {
     private:
         Memoria *memoriaProcessador;
@@ -23,7 +36,7 @@ class App {
         }
 
         int instructionDecoder (bitset<32> instrucao) {
-            //auto tipoInstrucao = mapeamentoOpcode(instrucao);
+            
         }
 
         void exec () {
@@ -37,7 +50,6 @@ class App {
     public:
 /* -- Construtor e Destrutor -- */
         App () {
-            memoriaProcessador = new Memoria ();
             contadorPC = 0;
         }
 
@@ -49,6 +61,12 @@ class App {
             bitset<32> registradorIFID;
             int registradorIDEX;
 
+            vector<string> listaInstrucoes = abrirArquivo();
+
+            vector<pair<unsigned,bitset<32>>> instrucoesCompiladas = Interpretador::interpretarInstrucoes(listaInstrucoes);
+            /* Escrever tudo na memoria */
+            memoriaProcessador = new Memoria (instrucoesCompiladas);
+
             while (true) {
                 registradorIFID = instructionFeatch();
                 registradorIDEX = instructionDecoder(registradorIFID);
@@ -56,8 +74,9 @@ class App {
             }
         }
 
-        void abrirArquivo () {
-
+        vector<string> abrirArquivo () {
+            vector<string> teste;
+            return teste;
         }
 };
 

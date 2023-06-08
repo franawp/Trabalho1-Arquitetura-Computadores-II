@@ -4,15 +4,20 @@ using namespace std;
 class Memoria {
     private:
         pair<bool,bitset<32>> *memoriaInstrucoes;
-        pair<bool,bitset<32>> *memoriaDados;
-        bitset<16> *bancoRegistradores;
+        pair<bool,bitset<16>> *memoriaDados;
+        bitset<32> *bancoRegistradores;
 
     public:
 /* -- Construtor e Destrutor -- */
-        Memoria () {
+        Memoria (vector<pair<unsigned,bitset<32>>> listaInstrucoes) {
             memoriaInstrucoes = new pair<bool,bitset<32>>[64*1024];
-            memoriaDados = new pair<bool,bitset<32>>[64*1024];
-            bancoRegistradores = new bitset<16>[32];
+            
+            for (pair<unsigned,bitset<32>> instrucao : listaInstrucoes) {
+                memoriaInstrucoes[instrucao.first] = {true,instrucao.second};
+            }
+
+            memoriaDados = new pair<bool,bitset<16>>[64*1024];
+            bancoRegistradores = new bitset<32>[32];
         }
 
         ~Memoria () {
@@ -26,17 +31,17 @@ class Memoria {
             return memoriaInstrucoes[endereco].second;
         }
 
-        void escritaMemoriaDados (bitset<32> dado, unsigned posicao) {
+        void escritaMemoriaDados (bitset<16> dado, unsigned posicao) {
             memoriaDados[posicao].first = true;
             memoriaDados[posicao].second = dado;
         }
 
 /* -- Métodos que envolvem o banco de registradores --*/
-        void escritaBancoRegistradores (bitset<16> dado, unsigned numeroRegistrador) {
+        void escritaBancoRegistradores (bitset<32> dado, unsigned numeroRegistrador) {
             bancoRegistradores[numeroRegistrador] = dado;
         }
 
-        bitset<16> getValorRegistrador (unsigned numeroRegistrador) {
+        bitset<32> getValorRegistrador (unsigned numeroRegistrador) {
             return bancoRegistradores[numeroRegistrador];
         }
 };
