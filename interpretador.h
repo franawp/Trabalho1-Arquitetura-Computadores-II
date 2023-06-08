@@ -5,22 +5,38 @@ class Interpretador {
     private:
         static map<string,bitset<8>> hashOpcode;
         map<string,bitset<8>> hashOpcode = {
-            {"add", 0b00}   ,{"sub", 0b01},
-            {"zeros", 0b10} ,{"xor", 0b11},
-            {"or", 0b11}    ,{"passnota", 0b11},
-            {"and", 0b11}   ,{"asl", 0b11},
-            {"asr", 0b11}   ,{"lsl", 0b11},
-            {"lsr", 0b11}   ,{"passa", 0b11},
-            {"lch", 0b11}   ,{"lcl", 0b11},
-            {"load", 0b11}  ,{"store", 0b11},
-            {"jal", 0b11}   ,{"jr", 0b11},
-            {"beq", 0b11}   ,{"bne", 0b11},
-            {"j", 0b11}     ,{"nova1", 0b11},
-            {"nova2", 0b11} ,{"nova3", 0b11},
-            {"nova4", 0b11} ,{"nova5", 0b11},
-            {"nova6", 0b11} ,{"nova7", 0b11},
-            {"nova8", 0b11} ,{"nova9", 0b11},
-            {"nova10", 0b11},{"nova11", 0b11},
+            {"add", 0b00},
+            {"sub", 0b01},
+            {"zeros", 0b10},
+            {"xor", 0b11},
+            {"or", 0b11},
+            {"passnota", 0b11},
+            {"and", 0b11},
+            {"asl", 0b11},
+            {"asr", 0b11},
+            {"lsl", 0b11},
+            {"lsr", 0b11},
+            {"passa", 0b11},
+            {"lch", 0b11},
+            {"lcl", 0b11},
+            {"load", 0b11},
+            {"store", 0b11},
+            {"jal", 0b11},
+            {"jr", 0b11},
+            {"beq", 0b11},
+            {"bne", 0b11},
+            {"j", 0b11},
+            {"nova1", 0b11},
+            {"nova2", 0b11},
+            {"nova3", 0b11},
+            {"nova4", 0b11},
+            {"nova5", 0b11},
+            {"nova6", 0b11},
+            {"nova7", 0b11},
+            {"nova8", 0b11},
+            {"nova9", 0b11},
+            {"nova10", 0b11},
+            {"nova11", 0b11}
         };
 
         static vector<string> splitar (string instrucao) {
@@ -105,3 +121,6 @@ class Interpretador {
         }
 
 };
+/*
+adress 0
+*/
