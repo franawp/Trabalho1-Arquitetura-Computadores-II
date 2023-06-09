@@ -17,9 +17,14 @@ struct Flags {
 };
 */
 
-void execMemoria (Flags controle) {
-    if(controle.opcode == 0b00000001){
 
+
+pair execMemoria (Flags controle,Memoria *memProcessador) {
+    pair<bitset<8>,bitset<32>> resultado;
+    bitset<32> result;
+
+    if(controle.opcode == 0b00000001){ // Instrução de ADD
+        result = controle.registradorA | controle.registradorB;
     }
     else if(controle.opcode == 0b00000010){
         
@@ -28,15 +33,17 @@ void execMemoria (Flags controle) {
 
     }
     else if(controle.opcode == 0b00000100){
-
+        result = controle.registradorA ^ controle.registradorB;
     }
     else if(controle.opcode == 0b00000101){
+        result = controle.registradorA | controle.registradorB;
 
     }
     else if(controle.opcode == 0b00000110){
-
+        result = ~controle.registradorA;
     }
     else if(controle.opcode == 0b00000111){
+        result = controle.registradorA & controle.registradorB;
 
     }
     else if(controle.opcode == 0b00001000){
@@ -52,7 +59,7 @@ void execMemoria (Flags controle) {
 
     }
     else if(controle.opcode == 0b00001100){
-
+        
     }
     else if(controle.opcode == 0b00001101){
 
@@ -79,6 +86,7 @@ void execMemoria (Flags controle) {
 
     }
     else if(controle.opcode == 0b00010101){
-        
+
     }
+    return resultado;
 }
