@@ -19,7 +19,7 @@ struct Flags {
 
 
 
-pair execMemoria (Flags controle,Memoria *memProcessador) {
+pair<bitset<8>, bitset<32>> execMemoria (Flags controle,Memoria *memProcessador) {
     pair<bitset<8>,bitset<32>> resultado;
     bitset<32> result;
 

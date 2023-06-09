@@ -2,31 +2,24 @@
 using namespace std;
 
 int main () {
-    bitset<8> instrucao1;
-    bitset<8> instrucao2;
-    bitset<8> instrucao3;
-    bitset<8> instrucao4;
-    bitset<32> completa = 0b011001011101000111010011;
+    std::bitset<4> a("1010");
+    std::bitset<4> b("1100"); 
 
-    for (int i=31; i>=0; i--) {
-        for (int j=7; j>=0; j--, i--) {
-            instrucao1[j] = completa[i];
-        }
+    
 
-        for (int j=7; j>=0; j--, i--) {
-            instrucao2[j] = completa[i];
-        }
+    std::bitset<4> sum;
+    std::bitset<4> carry;
 
-        for (int j=7; j>=0; j--, i--) {
-            instrucao3[j] = completa[i];
-        }
+    sum = a ^ b;          // Soma bit a bit
+    carry = (a & b) << 1; // Calcula o carry
 
-        for (int j=7; j>=0; j--, i--) {
-            instrucao4[j] = completa[i];
-        }
+    while (carry.any()) {
+        std::bitset<4> temp_sum = sum;
+        sum = temp_sum ^ carry;          // Soma bit a bit com o carry
+        carry = (temp_sum & carry) << 1; // Calcula o novo carry
     }
-
-    cout << instrucao1 << endl << instrucao2 << endl << instrucao3 << endl << instrucao4 << endl;
+    cout << sum << endl;
+    return 0;
 }
 
 /*
