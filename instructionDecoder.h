@@ -19,8 +19,8 @@ Flags instructionDecoder(bitset<32>instrucao,Memoria *memoriaProcessador){
     Flags controle;
     bitset<8>enderecoFonteA;
     bitset<8>enderecoFonteB;
-    
-    for (int i=31; i>=0; i--) {
+    int contador = 7;
+    for (int i=31; i>0; i++) {
         for (int j=7; j>=0; j--, i--) {
             controle.opcode[j] = instrucao[i];
         }
