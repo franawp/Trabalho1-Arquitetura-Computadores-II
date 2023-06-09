@@ -1,4 +1,6 @@
+#include <bits/stdc++.h>
 #include <memoria.h>
+using namespace std;
 
 struct Flags {
     bitset<8> opcode;
@@ -18,24 +20,26 @@ Flags instructionDecoder(bitset<32>instrucao,Memoria *memoriaProcessador){
     bitset<8>enderecoFonteA;
     bitset<8>enderecoFonteB;
     int contador = 7;
-    for(int i = 31; i > 23; i--){
-        controle.opcode[contador] = instrucao[i];
-        contador--;
-    }
-    contador = 7;
-    for(int i = 23; i > 15; i--){
-        enderecoFonteA[contador] = instrucao[i];
-        contador--;
-    }
-    contador = 7;
-    for(int i = 15; i > 7; i--){
-        enderecoFonteB[contador] = instrucao[i];
-        contador--;
-    }
-    contador = 7;
-    for(int i = 7; i >= 0; i--){
-        controle.registradorC[contador] = instrucao[i];
-        contador--;
+    for (int i=31; i>=0; i++) {
+        for (int j=7; j>=0; j--, i--) {
+            controle.opcode[j] = instrucao[i];
+            contador--;
+        }
+
+        for (int j=7; j>=0; j--, i--) {
+            enderecoFonteA[j] = instrucao[i];
+            contador--;
+        }
+
+        for (int j=7; j>=0; j--, i--) {
+            enderecoFonteB[j] = instrucao[i];
+            contador--;
+        }
+
+        for (int j=7; j>=0; j--, i--) {
+            controle.registradorC[j] = instrucao[i];
+            contador--;
+        }
     }
 
     //Tratando as operações add e sub.
