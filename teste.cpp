@@ -2,9 +2,31 @@
 using namespace std;
 
 int main () {
-    bitset<7> numero = 35;
-    cout << numero << endl;
-    return 0;
+    bitset<8> instrucao1;
+    bitset<8> instrucao2;
+    bitset<8> instrucao3;
+    bitset<8> instrucao4;
+    bitset<32> completa = 0b011001011101000111010011;
+
+    for (int i=31; i>=0; i--) {
+        for (int j=7; j>=0; j--, i--) {
+            instrucao1[j] = completa[i];
+        }
+
+        for (int j=7; j>=0; j--, i--) {
+            instrucao2[j] = completa[i];
+        }
+
+        for (int j=7; j>=0; j--, i--) {
+            instrucao3[j] = completa[i];
+        }
+
+        for (int j=7; j>=0; j--, i--) {
+            instrucao4[j] = completa[i];
+        }
+    }
+
+    cout << instrucao1 << endl << instrucao2 << endl << instrucao3 << endl << instrucao4 << endl;
 }
 
 /*
