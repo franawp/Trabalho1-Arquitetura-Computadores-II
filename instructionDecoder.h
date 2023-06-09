@@ -65,7 +65,7 @@ Flags instructionDecoder(bitset<32>instrucao,Memoria *memoriaProcessador){
         controle.memWrite = false;
     }
     //Instruções de constante
-    else if(controle.opcode == 0b00001101 or controle.opcode == 0b00001110 or controle.opcode == 0b00001111 or controle.opcode == 0b00010000){
+    else if(controle.opcode == 0b00001101 or controle.opcode == 0b00001110){
         controle.zero = false;
         controle.carry = false;
         controle.neg = false;
@@ -74,7 +74,7 @@ Flags instructionDecoder(bitset<32>instrucao,Memoria *memoriaProcessador){
         controle.memWrite = true; // talvez
     }
     //Instrução de Load
-    else if(controle.opcode == 0b00010001){
+    else if(controle.opcode == 0b0001111){
         controle.zero = false;
         controle.carry = false;
         controle.neg = false;
@@ -83,7 +83,34 @@ Flags instructionDecoder(bitset<32>instrucao,Memoria *memoriaProcessador){
         controle.memWrite = false;
     }
     // Instrução de Store
+    else if(controle.opcode == 0b00010000){
+        controle.zero = false;
+        controle.carry = false;
+        controle.neg = false;
+        controle.carry = false;
+        controle.memRead = false;
+        controle.memWrite = true;
+    }
+    // Intrução do tipo Jal e j
+    else if(controle.opcode == 0b00010001 or controle.opcode == 0b00010101){
+        controle.zero = false;
+        controle.carry = false;
+        controle.neg = false;
+        controle.carry = false;
+        controle.memRead = false;
+        controle.memWrite = true;
+    }
+    // Instrução do tipo jr
     else if(controle.opcode == 0b00010010){
+        controle.zero = false;
+        controle.carry = false;
+        controle.neg = false;
+        controle.carry = false;
+        controle.memRead = false;
+        controle.memWrite = true;
+    }
+    // Instrução beq e bne
+    else if(controle.opcode == 0b00010011 or controle.opcode == 0b00010100){
         controle.zero = false;
         controle.carry = false;
         controle.neg = false;
