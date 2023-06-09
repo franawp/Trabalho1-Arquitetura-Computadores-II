@@ -22,22 +22,18 @@ Flags instructionDecoder(bitset<32>instrucao,Memoria *memoriaProcessador){
     for (int i=31; i>=0;) {
         for (int j=7; j>=0; j--, i--) {
             controle.opcode[j] = instrucao[i];
-            contador--;
         }
 
         for (int j=7; j>=0; j--, i--) {
             enderecoFonteA[j] = instrucao[i];
-            contador--;
         }
 
         for (int j=7; j>=0; j--, i--) {
             enderecoFonteB[j] = instrucao[i];
-            contador--;
         }
 
         for (int j=7; j>=0; j--, i--) {
             controle.registradorC[j] = instrucao[i];
-            contador--;
         }
     }
 
