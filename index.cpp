@@ -62,16 +62,33 @@ class App {
                 //registradorEXWB = execMemoria ()
             }
         }
-
-        vector<string> abrirArquivo () {
-            vector<string> teste;
-            return teste;
-        }
 };
 
 
 
+vector<string> abrirArquivo () {
+    vector<string> listaInstrucoes;
+    string nomeArquivo;
 
+    cout << "Digite o nome do arquivo (Exemplo: \"texte.txt\"): ";
+    cin >> nomeArquivo;
+
+
+    ifstream arquivoEntrada (nomeArquivo);
+
+    try {
+        if (arquivoEntrada) {
+
+        }
+        else {
+            
+        }
+    }
+    catch (const char* exepction) {
+
+    }
+    return listaInstrucoes;
+}
 
 
 
