@@ -46,6 +46,8 @@ Flags instructionDecoder(bitset<32>instrucao,Memoria *memoriaProcessador){
         controle.carry = true;
         controle.memRead = false;
         controle.memWrite = false;
+        controle.registradorA = memoriaProcessador->getValorRegistrador(enderecoFonteA.to_ulong());
+        controle.registradorB = memoriaProcessador->getValorRegistrador(enderecoFonteB.to_ulong());
     }
     else if(controle.opcode == 0b00000011){ //Instrução de zero
         controle.zero = true;
@@ -54,6 +56,8 @@ Flags instructionDecoder(bitset<32>instrucao,Memoria *memoriaProcessador){
         controle.carry = false;
         controle.memRead = false;
         controle.memWrite = false;
+        controle.registradorA = memoriaProcessador->getValorRegistrador(enderecoFonteA.to_ulong());
+        controle.registradorB = memoriaProcessador->getValorRegistrador(enderecoFonteB.to_ulong());
     }
     //Instruções Lógicas
     else if(controle.opcode == 0b00000100 or controle.opcode == 0b00000101 or controle.opcode == 0b00000110 or controle.opcode == 0b00000111 or controle.opcode == 0b00001000 or controle.opcode == 0b00001001 or controle.opcode == 0b00001010 or controle.opcode == 0b00001011 or controle.opcode == 0b00001100){
@@ -63,6 +67,8 @@ Flags instructionDecoder(bitset<32>instrucao,Memoria *memoriaProcessador){
         controle.carry = false;
         controle.memRead = false;
         controle.memWrite = false;
+        controle.registradorA = memoriaProcessador->getValorRegistrador(enderecoFonteA.to_ulong());
+        controle.registradorB = memoriaProcessador->getValorRegistrador(enderecoFonteB.to_ulong());
     }
     //Instruções de constante
     else if(controle.opcode == 0b00001101 or controle.opcode == 0b00001110){
@@ -118,4 +124,5 @@ Flags instructionDecoder(bitset<32>instrucao,Memoria *memoriaProcessador){
         controle.memRead = false;
         controle.memWrite = true;
     }
+    return controle;
 }
