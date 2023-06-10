@@ -22,8 +22,9 @@ vector<string> abrirArquivo () {
                 if (find(linhaArquivo.begin(), linhaArquivo.end(), '#') != linhaArquivo.end()) {
                     /* Se o # for o primeiro elemento, a linha toda é descartada */
                     if ('#' == linhaArquivo[0]) {
-                        continue; //Não adiciono nada a lista de comentarios
+                        continue; //Não adiciono nada a lista de instrucoes
                     }
+
                     /* Caso contrario, concateno até achar o comentário */
                     else {
                         string auxiliar = "";
@@ -44,6 +45,7 @@ vector<string> abrirArquivo () {
                         continue; // Já adicionei a lista de instrucoes
                     }
                 }
+                
                 else if (linhaArquivo.size() == 0) {
                     continue;
                 }
