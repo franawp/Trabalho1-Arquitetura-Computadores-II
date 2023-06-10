@@ -116,11 +116,18 @@ class Processador {
             bitset<32> result;
 
             if (registradorIDEX.opcode == 0b00000001) { // Instrução de ADD
+                pair<bool,bitset<32>> soma = somaBinaria(registradorIDEX.registradorA,registradorIDEX.registradorB);
                 
+                if (soma.first) {
+                    /* flag de overflow */
+                }
+                else {
+                    result = soma.second;
+                }
             }
 
             else if (registradorIDEX.opcode == 0b00000010) {
-                
+                somaBinaria(registradorIDEX.registradorA, complementoDeDois(registradorIDEX.registradorB));
             }
 
             else if (registradorIDEX.opcode == 0b00000011) {
@@ -245,6 +252,23 @@ class Processador {
             }
             else {
                 return "";
+            }
+        }
+
+        bitset<32> complementoDeDois (bitset<32> registrador) {
+            registrador.flip();
+            bool carry = 1;
+            int i = 0;
+
+            while (carry) {
+                if (!registrador[i]) {
+                    registrador[i] = 0b1;
+                    carry = 0;
+                }
+                else {
+                    registrador[i] = 0b0;
+                }
+                i++;
             }
         }
 

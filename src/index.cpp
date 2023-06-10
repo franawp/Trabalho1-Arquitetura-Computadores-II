@@ -45,7 +45,7 @@ vector<string> abrirArquivo () {
                         continue; // Já adicionei a lista de instrucoes
                     }
                 }
-                
+
                 else if (linhaArquivo.size() == 0) {
                     continue;
                 }
@@ -82,12 +82,17 @@ vector<string> abrirArquivo () {
 
 int main () {
     vector<string> listaInstrucoes = abrirArquivo();
-    auto instrucoes = Interpretador::interpretarInstrucoes(listaInstrucoes);
+    vector<pair<unsigned,bitset<32>>> instrucoes = Interpretador::interpretarInstrucoes(listaInstrucoes);
     
+    /*
     for (auto i : instrucoes) {
         cout << i.first << " " << i.second << endl;
     }
-    //Processador *processadorUFLA_RISC;
+    */
+    Processador *processadorUFLA_RISC;
+    processadorUFLA_RISC = new Processador(instrucoes);
+
+    processadorUFLA_RISC->executarInstrucoes();
     
     return 0;
 }

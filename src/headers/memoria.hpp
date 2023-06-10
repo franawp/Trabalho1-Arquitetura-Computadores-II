@@ -27,7 +27,7 @@ class Memoria {
         }
 
 /* -- Métodos que envolvem operação na memória -- */
-        bitset<32> getInstrucao (int endereco) {
+        bitset<32> getInstrucao (unsigned endereco) {
             return memoriaInstrucoes[endereco].second;
         }
 
