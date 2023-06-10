@@ -108,37 +108,6 @@ class Processador {
             return {controle,registradores};
         }
 
-        pair<bool,bitset<32>> somaBinaria (bitset<32> registrador1, bitset<32> registrador2) {
-            bitset<32> resultado;
-            bitset<1> bitAuxiliar;
-            bitset<1> carry;
-            bool overflow = false;
-
-            for (int i=0; i<32; i++) {
-                if (registrador1[i] & registrador2[i] & carry[0] ) {
-                    resultado[i] = 0b1;
-                    carry = 0b1;
-                    if (i == 31) {
-                        overflow = true;
-                    }
-                }
-                else if (registrador1[i] & registrador2[i] || registrador2[i] & carry[0] || registrador1[i] & carry[0]) {
-                    resultado[i] = 0b0;
-                    carry = 0b0;
-                }
-                else if (registrador1[i] | registrador2[i] || registrador2[i] | carry[0] || registrador1[i] | carry[0]) {
-                    resultado[i] = 0b1;
-                    carry = 0b0;
-                }
-                else {
-                    resultado[i] = 0b0;
-                    carry = 0b0;
-                }
-            }
-
-            return {overflow,resultado};
-        }
-
         /* METADE PRONTO */
         pair<bitset<8>, bitset<32>> execMemoria (pair<Flags,Quadrupla> decoder) {
             Flags controle = decoder.first;
@@ -277,6 +246,37 @@ class Processador {
             else {
                 return "";
             }
+        }
+
+        pair<bool,bitset<32>> somaBinaria (bitset<32> registrador1, bitset<32> registrador2) {
+            bitset<32> resultado;
+            bitset<1> bitAuxiliar;
+            bitset<1> carry;
+            bool overflow = false;
+
+            for (int i=0; i<32; i++) {
+                if (registrador1[i] & registrador2[i] & carry[0] ) {
+                    resultado[i] = 0b1;
+                    carry = 0b1;
+                    if (i == 31) {
+                        overflow = true;
+                    }
+                }
+                else if (registrador1[i] & registrador2[i] || registrador2[i] & carry[0] || registrador1[i] & carry[0]) {
+                    resultado[i] = 0b0;
+                    carry = 0b0;
+                }
+                else if (registrador1[i] | registrador2[i] || registrador2[i] | carry[0] || registrador1[i] | carry[0]) {
+                    resultado[i] = 0b1;
+                    carry = 0b0;
+                }
+                else {
+                    resultado[i] = 0b0;
+                    carry = 0b0;
+                }
+            }
+
+            return {overflow,resultado};
         }
     public:
 /* -- Construtor e Destrutor -- */
