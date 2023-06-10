@@ -291,7 +291,7 @@ class Processador {
                 return "imediate";
             }
             else if(opcode == 0b11111111){
-                return "halt"
+                return "halt";
             }
         }
 
