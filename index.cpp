@@ -1,70 +1,7 @@
 #include <bits/stdc++.h>
-#include <interpretador.h>
-#include <memoria.h>
-#include <instructionDecoder.h>
-//#include <instructionFeatch.h>
+#include <interpretador.hpp>
+#include <processador.hpp>
 using namespace std;
-
-struct Exception {
-    string mensagens;
-    int codigo;
-};
-
-
-
-class App {
-    private:
-        Memoria *memoriaProcessador;
-        unsigned contadorPC;
-
-        /* -- 4 Rotinas principais -- */
-        bitset<32> instructionFeatch () {
-            bitset<32> instrucao = memoriaProcessador->getInstrucao(contadorPC);
-            contadorPC++;
-            return instrucao;
-        }
-
-        int instructionDecoder (bitset<32> instrucao) {
-            
-        }
-
-        void exec () {
-
-        }
-
-        void writeBack (pair<bitset<8>, bitset<32>> dados) {
-
-        }
-
-    public:
-/* -- Construtor e Destrutor -- */
-        App () {
-            contadorPC = 0;
-        }
-
-        ~App () {
-            delete[] memoriaProcessador;
-        }
-
-        void executar () {
-            bitset<32> registradorIFID;
-            int registradorIDEX;
-
-            vector<string> listaInstrucoes = abrirArquivo();
-
-            vector<pair<unsigned,bitset<32>>> instrucoesCompiladas = Interpretador::interpretarInstrucoes(listaInstrucoes);
-            /* Escrever tudo na memoria */
-            memoriaProcessador = new Memoria (instrucoesCompiladas);
-
-            while (true) {
-                registradorIFID = instructionFeatch();
-                registradorIDEX = instructionDecoder(registradorIFID);
-                //registradorEXWB = execMemoria ()
-            }
-        }
-};
-
-
 
 vector<string> abrirArquivo () {
     vector<string> listaInstrucoes;
@@ -112,5 +49,6 @@ vector<string> abrirArquivo () {
 
 
 int main () {
+    Processador *processadorUFLA_RISC;
     return 0;
 }

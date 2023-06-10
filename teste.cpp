@@ -1,25 +1,9 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+
 int main () {
-    std::bitset<4> a("1010");
-    std::bitset<4> b("1100"); 
-
     
-
-    std::bitset<4> sum;
-    std::bitset<4> carry;
-
-    sum = a ^ b;          // Soma bit a bit
-    carry = (a & b) << 1; // Calcula o carry
-
-    while (carry.any()) {
-        std::bitset<4> temp_sum = sum;
-        sum = temp_sum ^ carry;          // Soma bit a bit com o carry
-        carry = (temp_sum & carry) << 1; // Calcula o novo carry
-    }
-    cout << sum << endl;
-    return 0;
 }
 
 /*

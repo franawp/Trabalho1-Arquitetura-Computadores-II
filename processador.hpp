@@ -74,35 +74,36 @@ class Processador {
                 registradorIDEX.registradorB = memoriaProcessador->getValorRegistrador(enderecoFonteB.to_ulong());
             }
 
-            else if(tipo == "logica") {
+            else if (tipo == "logica") {
                 controle = {false,true,true,false,false,false};
                 registradorIDEX.registradorA = memoriaProcessador->getValorRegistrador(enderecoFonteA.to_ulong());
                 registradorIDEX.registradorB = memoriaProcessador->getValorRegistrador(enderecoFonteB.to_ulong());
             }
             
-            else if(tipo == "constante") {
+            else if (tipo == "constante") {
                 controle = {false,false,false,false,false,false};
             }
             
-            else if(tipo == "load"){
+            else if (tipo == "load") {
                 controle = {false,false,false,false,true,false};
             }
             
-            else if(tipo == "store"){
+            else if (tipo == "store") {
                 controle = {false,false,false,false,false,true};
             }
             
-            else if(tipo == "jump"){
+            else if (tipo == "jump") {
                 controle = {false,false,false,false,false,true};
             }
             
-            else if(tipo == "jr"){
+            else if (tipo == "jr") {
                 controle = {false,false,false,false,false,true};
             }
             
-            else if(tipo == "branch"){
+            else if (tipo == "branch") {
                 controle = {false,false,false,false,false,true};
             }
+            
             return {controle,registradorIDEX};
         }
 
