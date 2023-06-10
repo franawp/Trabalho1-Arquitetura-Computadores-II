@@ -33,7 +33,7 @@ class Processador {
         }
 
         /* QUASE PRONTO */
-        pair<Flags,Quadrupla> instructionDecoder (bitset<32>instrucao,Memoria *memoriaProcessador) {
+        pair<Flags,Quadrupla> instructionDecoder (bitset<32>instrucao) {
             /* Variáveis */
             Flags controle;
             Quadrupla registradorIDEX;
