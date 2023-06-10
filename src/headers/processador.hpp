@@ -9,6 +9,7 @@ struct Flags {
     bool carry;
     bool memRead;
     bool memWrite;
+    bool regWrite;
 };
 
 struct Quadrupla {
@@ -36,14 +37,14 @@ class Processador {
         pair<Flags,Quadrupla> instructionDecoder (bitset<32>instrucao) {
             /* Variáveis */
             Flags controle;
-            Quadrupla registradorIDEX;
+            Quadrupla registradores;
             bitset<8>enderecoFonteA;
             bitset<8>enderecoFonteB;
             string tipo;
             
             for (int i=31; i>=0; i--) {
                 for (int j=7; j>=0; j--, i--) {
-                    registradorIDEX.opcode[j] = instrucao[i];
+                    registradores.opcode[j] = instrucao[i];
                 }
 
                 for (int j=7; j>=0; j--, i--) {
@@ -55,29 +56,29 @@ class Processador {
                 }
 
                 for (int j=7; j>=0; j--, i--) {
-                    registradorIDEX.registradorC[j] = instrucao[i];
+                    registradores.registradorC[j] = instrucao[i];
                 }
             }
 
-            tipo = tipoOperacao (registradorIDEX.opcode);
+            tipo = tipoOperacao (registradores.opcode);
 
             /* controle = {overflow, neg, zero, carry, memRead, memWrite } */
             if (tipo == "soma") {             
-                controle = {false,true,true,true,false,false};
-                registradorIDEX.registradorA = memoriaProcessador->getValorRegistrador(enderecoFonteA.to_ulong());
-                registradorIDEX.registradorB = memoriaProcessador->getValorRegistrador(enderecoFonteB.to_ulong());
+                controle = {true,true,true,true,false,false};
+                registradores.registradorA = memoriaProcessador->getValorRegistrador(enderecoFonteA.to_ulong());
+                registradores.registradorB = memoriaProcessador->getValorRegistrador(enderecoFonteB.to_ulong());
             }
 
             else if (tipo == "zero") {
                 controle = {false,false,true,false,false,false};
-                registradorIDEX.registradorA = memoriaProcessador->getValorRegistrador(enderecoFonteA.to_ulong());
-                registradorIDEX.registradorB = memoriaProcessador->getValorRegistrador(enderecoFonteB.to_ulong());
+                registradores.registradorA = memoriaProcessador->getValorRegistrador(enderecoFonteA.to_ulong());
+                registradores.registradorB = memoriaProcessador->getValorRegistrador(enderecoFonteB.to_ulong());
             }
 
             else if (tipo == "logica") {
                 controle = {false,true,true,false,false,false};
-                registradorIDEX.registradorA = memoriaProcessador->getValorRegistrador(enderecoFonteA.to_ulong());
-                registradorIDEX.registradorB = memoriaProcessador->getValorRegistrador(enderecoFonteB.to_ulong());
+                registradores.registradorA = memoriaProcessador->getValorRegistrador(enderecoFonteA.to_ulong());
+                registradores.registradorB = memoriaProcessador->getValorRegistrador(enderecoFonteB.to_ulong());
             }
             
             else if (tipo == "constante") {
@@ -93,18 +94,49 @@ class Processador {
             }
             
             else if (tipo == "jump") {
-                controle = {false,false,false,false,false,true};
+                controle = {false,false,false,false,false,false};
             }
             
             else if (tipo == "jr") {
-                controle = {false,false,false,false,false,true};
+                controle = {false,false,false,false,false,false};
             }
             
             else if (tipo == "branch") {
-                controle = {false,false,false,false,false,true};
+                controle = {false,false,false,false,false,false};
             }
             
-            return {controle,registradorIDEX};
+            return {controle,registradores};
+        }
+
+        pair<bool,bitset<32>> somaBinaria (bitset<32> registrador1, bitset<32> registrador2) {
+            bitset<32> resultado;
+            bitset<1> bitAuxiliar;
+            bitset<1> carry;
+            bool overflow = false;
+
+            for (int i=0; i<32; i++) {
+                if (registrador1[i] & registrador2[i] & carry[0] ) {
+                    resultado[i] = 0b1;
+                    carry = 0b1;
+                    if (i == 31) {
+                        overflow = true;
+                    }
+                }
+                else if (registrador1[i] & registrador2[i] || registrador2[i] & carry[0] || registrador1[i] & carry[0]) {
+                    resultado[i] = 0b0;
+                    carry = 0b0;
+                }
+                else if (registrador1[i] | registrador2[i] || registrador2[i] | carry[0] || registrador1[i] | carry[0]) {
+                    resultado[i] = 0b1;
+                    carry = 0b0;
+                }
+                else {
+                    resultado[i] = 0b0;
+                    carry = 0b0;
+                }
+            }
+
+            return {overflow,resultado};
         }
 
         /* METADE PRONTO */
@@ -115,7 +147,7 @@ class Processador {
             bitset<32> result;
 
             if (registradorIDEX.opcode == 0b00000001) { // Instrução de ADD
-                result = registradorIDEX.registradorA | registradorIDEX.registradorB;
+                
             }
 
             else if (registradorIDEX.opcode == 0b00000010) {
@@ -132,7 +164,6 @@ class Processador {
 
             else if (registradorIDEX.opcode == 0b00000101) {
                 result = registradorIDEX.registradorA | registradorIDEX.registradorB;
-
             }
 
             else if (registradorIDEX.opcode == 0b00000110) {
@@ -200,11 +231,14 @@ class Processador {
 
             }
 
+            resultado.second = result;
+
             return resultado;
         }
 
         /* PRONTO */
         void writeBack (pair<bitset<8>, bitset<32>> dados) {
+            /* Adicionar Flag RegWrite */
             memoriaProcessador->escritaBancoRegistradores(dados.second,dados.first.to_ulong());
         }
 
@@ -256,6 +290,20 @@ class Processador {
         }
 /* -- Método principal-- */
         void executarInstrucoes () {
+            bitset<32> registradorIFID;
+            pair<Flags,Quadrupla> registradorIDEX;
+            pair<bitset<8>, bitset<32>> registradorMEMWB;
 
+            while (true) {
+                registradorIFID = instructionFeatch();
+                /* Parar de executar a hora que buscar uma instrução e nao achar nada */
+                if (registradorIFID.none()) {
+                    break;
+                }
+
+                registradorIDEX = instructionDecoder(registradorIFID);
+                registradorMEMWB = execMemoria(registradorIDEX);
+                writeBack(registradorMEMWB);
+            }
         }
 };
