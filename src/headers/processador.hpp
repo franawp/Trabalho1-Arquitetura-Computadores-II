@@ -80,7 +80,9 @@ class Processador {
                 registradores.registradorA = memoriaProcessador->getValorRegistrador(enderecoFonteA.to_ulong());
                 registradores.registradorB = memoriaProcessador->getValorRegistrador(enderecoFonteB.to_ulong());
             }
-            
+            else if(tipo == "imediate"){
+                controle = {false,false,false,false,false,false};
+            }
             else if (tipo == "constante") {
                 controle = {false,false,false,false,false,false};
             }
@@ -104,7 +106,9 @@ class Processador {
             else if (tipo == "branch") {
                 controle = {false,false,false,false,false,false};
             }
-            
+            else if (tipo == "halt"){
+                controle = {false,false,false,false,false,false};
+            }
             return {controle,registradores};
         }
 
@@ -206,6 +210,39 @@ class Processador {
             else if (registradorIDEX.opcode == 0b00010101) {
 
             }
+            else if (registradorIDEX.opcode == 0b00010110) {
+
+            }
+            else if (registradorIDEX.opcode == 0b00010111) {
+
+            }
+            else if (registradorIDEX.opcode == 0b00011000) {
+
+            }
+            else if (registradorIDEX.opcode == 0b00011001) {
+
+            }
+            else if (registradorIDEX.opcode == 0b00010101) {
+
+            }
+            else if (registradorIDEX.opcode == 0b00011010) {
+
+            }
+            else if (registradorIDEX.opcode == 0b00011011) {
+
+            }
+            else if (registradorIDEX.opcode == 0b00011100) {
+
+            }
+            else if (registradorIDEX.opcode == 0b00011101) {
+
+            }
+            else if (registradorIDEX.opcode == 0b00011110) {
+
+            }
+            else if (registradorIDEX.opcode == 0b00011111) {
+
+            }
 
             resultado.second = result;
 
@@ -229,7 +266,7 @@ class Processador {
             else if (opcode == 0b00000100 or opcode == 0b00000101 or 
                     opcode == 0b00000110 or opcode == 0b00000111 or 
                     opcode == 0b00001000 or opcode == 0b00001001 or 
-                    opcode == 0b00001010 or opcode == 0b00001011 or opcode == 0b00001100) {
+                    opcode == 0b00001010 or opcode == 0b00001011 or opcode == 0b00001100 or 0b00011101 or 0b00011110) {
                 return "logica";
             }
             else if (opcode == 0b00001101 or opcode == 0b00001110) {
@@ -247,11 +284,14 @@ class Processador {
             else if (opcode == 0b00010010) {
                 return "jr";
             }
-            else if (opcode == 0b00010011 or opcode == 0b00010100) {
+            else if (opcode == 0b00010011 or opcode == 0b00010100 or 0b00011011 or 0b00011100) {
                 return "branch";
             }
-            else {
-                return "";
+            else if (opcode == 0b00010110 or opcode == 0b00010111 or opcode == 0b00011010){
+                return "imediate";
+            }
+            else if(opcode == 0b11111111){
+                return "halt";
             }
         }
 
