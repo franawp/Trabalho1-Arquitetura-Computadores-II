@@ -80,9 +80,83 @@ class Processador {
         pair<bitset<8>, bitset<32>> execMemoria (Sextupla registradorIDEX) {
             pair<bitset<8>,bitset<32>> resultado;
 
-            string tipo = tipoInstrucao(registradorIDEX.opcode);
+            pair<string,string> tipo = tipoInstrucao(registradorIDEX.opcode);
 
-            if (tipo == "add") { // Pronto
+            if (tipo.second == "aritmetica") {
+                return operacaoAritmetica (registradorIDEX, tipo.first);
+            }
+
+            else if (tipo.second == "logica") {
+                return operacaoLogica (registradorIDEX, tipo.first);
+            }
+
+            else if (tipo.second == "shift") {
+                return operacaoShift (registradorIDEX, tipo.first);
+            }
+
+            else if (tipo.second == "branch") {
+                return operacaoBranch (registradorIDEX, tipo.first);
+            }
+
+            else if (tipo.second == "memoria") {
+                return operacaoMemoria (registradorIDEX, tipo.first);
+            }
+
+            return {0b0,0b0};
+
+            /*
+
+            else if (tipo == "novo1") {
+
+            }
+            else if (tipo == "novo1") {
+
+            }
+            else if (tipo == "novo1") {
+
+            }
+            else if (tipo == "novo1") {
+
+            }
+            else if (tipo == "novo1") {
+
+            }
+            else if (tipo == "novo1") {
+
+            }
+            */
+
+            return resultado;
+        }
+
+        /* PRONTO */
+        void writeBack (pair<bitset<8>, bitset<32>> dados) {
+            /* Adicionar Flag RegWrite */
+            memoriaProcessador->escritaBancoRegistradores(dados.second,dados.first.to_ulong());
+        }
+
+/* -- Métodos auxiliares -- */
+        pair<bitset<8>,bitset<32>> operacaoMemoria (Sextupla registradorIDEX, string tipo) {
+            if (tipo == "load") { 
+                bitset<32> endereco = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
+                bitset<32> dado (memoriaProcessador->getMemoriaDados(endereco.to_ulong()).to_ulong());
+                
+                return {registradorIDEX.numeroRegistradorC, dado};
+            }
+
+            else if (tipo == "store") {
+                bitset<16> dado (memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorC.to_ulong()).to_ulong());
+                
+                memoriaProcessador->escritaMemoriaDados(dado,registradorIDEX.numeroRegistradorA.to_ulong());
+
+                return {0b0, 0b0};
+            }
+
+            return {0b0, 0b0};
+        }
+
+        pair<bitset<8>,bitset<32>> operacaoAritmetica (Sextupla registradorIDEX, string tipo) {
+            if (tipo == "add") {
                 bitset<32> valorDeA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
                 bitset<32> valorDeB = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
                 pair<bool,bitset<32>> soma = somaBinaria(valorDeA,valorDeB);
@@ -91,11 +165,11 @@ class Processador {
                     /* flag de overflow */
                 }
                 else {
-                    resultado = {registradorIDEX.numeroRegistradorC,soma.second};
+                    return {registradorIDEX.numeroRegistradorC,soma.second};
                 }
             }
 
-            else if (tipo == "sub") { //Pronto
+            else if (tipo == "sub") {
                 bitset<32> valorDeA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
                 bitset<32> valorDeB = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
                 pair<bool,bitset<32>> sub = subtracaoBinaria(valorDeA,valorDeB);
@@ -104,89 +178,76 @@ class Processador {
                     /* flag de overflow */
                 }
                 else {
-                    resultado = {registradorIDEX.numeroRegistradorC,sub.second};
+                    return {registradorIDEX.numeroRegistradorC,sub.second};
                 }
             }
 
-            else if (tipo == "zeros") { //Pronto
-                resultado = {registradorIDEX.numeroRegistradorC,0b0};
+            else if (tipo == "zeros") {
+                return {registradorIDEX.numeroRegistradorC,0b0};
             }
 
-            else if (tipo == "xor") { //Pronto
+            else if (tipo == "passa") {
+                bitset<32> conteudoRegistradorA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
+                return {registradorIDEX.numeroRegistradorC,conteudoRegistradorA};
+            }
+        }
+
+        pair<bitset<8>,bitset<32>> operacaoLogica (Sextupla registradorIDEX, string tipo) {
+            if (tipo == "xor") {
                 bitset<32> valorDeA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
                 bitset<32> valorDeB = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
 
-                resultado = {registradorIDEX.numeroRegistradorC,(valorDeA ^ valorDeB)};
+                return {registradorIDEX.numeroRegistradorC,(valorDeA ^ valorDeB)};
             }
 
-            else if (tipo == "or") { //Pronto
+            else if (tipo == "or") {
                 bitset<32> valorDeA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
                 bitset<32> valorDeB = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
 
-                resultado = {registradorIDEX.numeroRegistradorC,(valorDeA | valorDeB)};
+                return {registradorIDEX.numeroRegistradorC,(valorDeA | valorDeB)};
             }
 
-            else if (tipo == "passnota") { //Pronto
+            else if (tipo == "passnota") {
                 bitset<32> valorDeA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
 
-                resultado = {registradorIDEX.numeroRegistradorC, ~valorDeA};
+                return {registradorIDEX.numeroRegistradorC, ~valorDeA};
             }
 
-            else if (tipo == "and") { //Pronto
+            else if (tipo == "and") {
                 bitset<32> valorDeA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
                 bitset<32> valorDeB = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
 
-                resultado = {registradorIDEX.numeroRegistradorC,(valorDeA & valorDeB)};
+                return {registradorIDEX.numeroRegistradorC,(valorDeA & valorDeB)};
             }
 
-            else if (tipo == "asl") { 
-                
+            else if (tipo == "nand") {
+                bitset<32> valorDeA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
+                bitset<32> valorDeB = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
+
+                return {registradorIDEX.numeroRegistradorC,~(valorDeA & valorDeB)};
             }
 
-            else if (tipo == "asr") {
+            else if (tipo == "xnor") {
+                bitset<32> valorDeA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
+                bitset<32> valorDeB = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
 
+                return {registradorIDEX.numeroRegistradorC, ~(valorDeA ^ valorDeB)};
             }
 
-            else if (tipo == "lsl") {
+            else if (tipo == "nor") {
+                bitset<32> valorDeA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
+                bitset<32> valorDeB = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
 
+                return {registradorIDEX.numeroRegistradorC,~(valorDeA | valorDeB)};
             }
+        }
 
-            else if (tipo == "lsr") {
-
-            }
-
-            else if (tipo == "passa") { //copia
-                //move(registradorIDEX.registradorA, registradorIDEX.registradorB);
-            }
-
-            else if (tipo == "lch") {
-                
-            }
-
-            else if (tipo == "lcl") {
-
-            }
-
-            else if (tipo == "load") { //pronto
-                bitset<32> endereco = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
-                bitset<32> dado (memoriaProcessador->getMemoriaDados(endereco.to_ulong()).to_ulong());
-                
-                resultado = {registradorIDEX.numeroRegistradorC, dado};
-            }
-
-            else if (tipo == "store") { //pronto
-                bitset<16> dado (memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorC.to_ulong()).to_ulong());
-                
-                memoriaProcessador->escritaMemoriaDados(dado,registradorIDEX.numeroRegistradorA.to_ulong());
-
-                resultado = {0b0, 0b0};
-            }
-
-            else if (tipo == "jal") { //pronto
+        pair<bitset<8>,bitset<32>> operacaoBranch (Sextupla registradorIDEX, string tipo) {
+            if (tipo == "jal") { //pronto
                 bitset<32> contadorPCAtual (contadorPC + 1);
                 bitset<8> registrador31 (31);
 
-                resultado = {registrador31,contadorPCAtual};
+                return {registrador31,contadorPCAtual};
 
                 atualizarContadorPc(registradorIDEX.endereco.to_ulong());
             }
@@ -195,7 +256,7 @@ class Processador {
                 bitset<32> conteudoRc = memoriaProcessador->getValorRegistrador(31);
                 atualizarContadorPc(conteudoRc.to_ulong());
 
-                resultado = {0b0, 0b0};
+                return {0b0, 0b0};
             }
 
             else if (tipo == "beq") { //pronto
@@ -208,10 +269,10 @@ class Processador {
                     atualizarContadorPc (valorDeC.to_ulong());
                 }
 
-                resultado = {0b0,0b0};
+                return {0b0,0b0};
             }
 
-            else if (tipo == "bne") { //pronto
+            else if (tipo == "bne") {
                 bitset<32> zero(0b0);
                 bitset<32> valorDeA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
                 bitset<32> valorDeB = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
@@ -221,37 +282,16 @@ class Processador {
                     atualizarContadorPc (valorDeC.to_ulong());
                 }
 
-                resultado = {0b0,0b0};
+                return {0b0,0b0};
             }
 
-            else if (tipo == "j") { //pronto
+            else if (tipo == "j") {
                 atualizarContadorPc(registradorIDEX.endereco.to_ulong());
 
-                resultado = {0b0, 0b0};
+                return {0b0, 0b0};
             }
 
-            else if (tipo == "nand") { //pronto
-                bitset<32> valorDeA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
-                bitset<32> valorDeB = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
-
-                resultado = {registradorIDEX.numeroRegistradorC,~(valorDeA & valorDeB)};
-            }
-
-            else if (tipo == "xnor") { //pronto
-                bitset<32> valorDeA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
-                bitset<32> valorDeB = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
-
-                resultado = {registradorIDEX.numeroRegistradorC, ~(valorDeA ^ valorDeB)};
-            }
-
-            else if (tipo == "nor") { //pronto
-                bitset<32> valorDeA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
-                bitset<32> valorDeB = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
-
-                resultado = {registradorIDEX.numeroRegistradorC,~(valorDeA | valorDeB)};
-            }
-
-            else if (tipo == "bgt") { // salte se maior
+            else if (tipo == "bgt") {
                 bitset<32> valorDeA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
                 bitset<32> valorDeB = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
                 bitset<32> valorDeC = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorC.to_ulong()); //endereço
@@ -269,8 +309,7 @@ class Processador {
                     }
                 }
                 
-                resultado = {0b0, 0b0};
-
+                return {0b0, 0b0};
             }
 
             else if (tipo == "blt") {
@@ -291,62 +330,67 @@ class Processador {
                     }
                 }
                 
-                resultado = {0b0, 0b0};
+                return {0b0, 0b0};
+            }
+        }
+
+        pair<bitset<8>,bitset<32>> operacaoShift (Sextupla registradorIDEX, string tipo) {
+            if (tipo == "asl") { 
                 
-
-            }
-            else if (tipo == "novo1") {
-
-            }
-            else if (tipo == "novo1") {
-
-            }
-            else if (tipo == "novo1") {
-
-            }
-            else if (tipo == "novo1") {
-
-            }
-            else if (tipo == "novo1") {
-
-            }
-            else if (tipo == "novo1") {
-
             }
 
-            return resultado;
+            else if (tipo == "asr") {
+                
+            }
+
+            else if (tipo == "lsl") {
+                bitset<32> valorB = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
+                bitset<32> valorA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
+
+                return {registradorIDEX.numeroRegistradorC, valorA << valorB.to_ulong()};
+            }
+
+            else if (tipo == "lsr") {
+                bitset<32> valorB = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
+                bitset<32> valorA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
+
+                return {registradorIDEX.numeroRegistradorC, valorA >> valorB.to_ulong()};
+            }
         }
 
-        /* PRONTO */
-        void writeBack (pair<bitset<8>, bitset<32>> dados) {
-            /* Adicionar Flag RegWrite */
-            memoriaProcessador->escritaBancoRegistradores(dados.second,dados.first.to_ulong());
+        pair<bitset<8>,bitset<32>> operacaoConstante (Sextupla registradorIDEX, string tipo) {
+            if (tipo == "lch") {
+                
+            }
+
+            else if (tipo == "lcl") {
+
+            }
         }
 
-/* -- Métodos auxiliares -- */
-        string tipoInstrucao (bitset<8> opcode) {
-            map <bitset<8>,string> hashInstrucao = {
-                {0b00000001,"add"},
-                {0b00000010,"sub"},
-                {0b00000011,"zeros"},
-                {0b00000100,"xor"},
-                {0b00000101,"or"},
-                {0b00000110,"passnota"},
-                {0b00000111,"and"},
-                {0b00001000,"asl"},
-                {0b00001001,"asr"},
-                {0b00001010,"lsl"},
-                {0b00001011,"lsr"},
-                {0b00001100,"passa"},
-                {0b00001101,"lch"},
-                {0b00001110,"lcl"},
-                {0b00001111,"load"},
-                {0b00010000,"store"},
-                {0b00010001,"jal"},
-                {0b00010010,"jr"},
-                {0b00010011,"beq"},
-                {0b00010100,"bne"},
-                {0b00010101,"j"}
+        pair<string,string> tipoInstrucao (bitset<8> opcode) {
+            map <bitset<8>,pair<string,string>> hashInstrucao = {
+                {0b00000001,{"add","aritmetica"}},
+                {0b00000010,{"sub","aritmetica"}},
+                {0b00000011,{"zeros","aritmetica"}},
+                {0b00000100,{"xor","logica"}},
+                {0b00000101,{"or","logica"}},
+                {0b00000110,{"passnota","logica"}},
+                {0b00000111,{"and","logica"}},
+                {0b00001000,{"asl","shift"}},
+                {0b00001001,{"asr","shift"}},
+                {0b00001010,{"lsl","shift"}},
+                {0b00001011,{"lsr","shift"}},
+                {0b00001100,{"passa","aritmetica"}},
+                {0b00001101,{"lch","NAO SEI"}},
+                {0b00001110,{"lcl","NAO SEI"}},
+                {0b00001111,{"load","memoria"}},
+                {0b00010000,{"store","memoria"}},
+                {0b00010001,{"jal","branch"}},
+                {0b00010010,{"jr","branch"}},
+                {0b00010011,{"beq","branch"}},
+                {0b00010100,{"bne","branch"}},
+                {0b00010101,{"j","branch"}}
             };
 
             return hashInstrucao[opcode];
@@ -436,13 +480,6 @@ class Processador {
             contadorPC = novoContador;
         }
 
-        //copy
-        void move(bitset<32> registradorCopia, bitset<32> registradorCopiado){
-            registradorCopia = registradorCopiado;
-        }
-
-        
-
     public:
 /* -- Construtor e Destrutor -- */
         Processador (vector<pair<unsigned,bitset<32>>> instrucoesCompiladas) {
@@ -468,7 +505,10 @@ class Processador {
 
                 registradorIDEX = instructionDecoder(registradorIFID);
                 registradorMEMWB = execMemoria(registradorIDEX);
-                writeBack(registradorMEMWB);
+
+                if (!registradorMEMWB.first.none()) {
+                    writeBack(registradorMEMWB);
+                }
             }
         }
 };
