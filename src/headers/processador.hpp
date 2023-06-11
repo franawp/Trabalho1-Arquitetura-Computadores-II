@@ -151,8 +151,8 @@ class Processador {
 
             }
 
-            else if (registradorIDEX.opcode == 0b00001000) {
-
+            else if (registradorIDEX.opcode == 0b00001000) { // shift aritmetico para a esquerda
+                
             }
 
             else if (registradorIDEX.opcode == 0b00001001) {
@@ -167,8 +167,8 @@ class Processador {
 
             }
 
-            else if (registradorIDEX.opcode == 0b00001100) {
-                
+            else if (registradorIDEX.opcode == 0b00001100) { //copia
+                //move(registradorA, registradorB)
             }
 
             else if (registradorIDEX.opcode == 0b00001101) {
@@ -183,11 +183,11 @@ class Processador {
 
             }
 
-            else if (registradorIDEX.opcode == 0b00010000) {
+            else if (registradorIDEX.opcode == 0b00010000) { //load
 
             }
 
-            else if (registradorIDEX.opcode == 0b00010001) {
+            else if (registradorIDEX.opcode == 0b00010001) { //store
 
             }
 
@@ -302,6 +302,14 @@ class Processador {
 
             return {overflow,resultado};
         }
+
+        //copy
+        void move(bitset<32> registradorCopia, bitset<32> registradorCopiado){
+            registradorCopia = registradorCopiado;
+        }
+
+        
+
     public:
 /* -- Construtor e Destrutor -- */
         Processador (vector<pair<unsigned,bitset<32>>> instrucoesCompiladas) {
