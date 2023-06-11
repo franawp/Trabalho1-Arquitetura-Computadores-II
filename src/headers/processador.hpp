@@ -12,11 +12,13 @@ struct Flags {
     bool regWrite;
 };
 
-struct Quadrupla {
+struct Sextupla {
     bitset<8> opcode;
     bitset<32> registradorA;
     bitset<32> registradorB;
     bitset<8> registradorC;
+    bitset<16> constante;
+    bitset<24> endereco;
 };
 
 class Processador {
@@ -33,89 +35,52 @@ class Processador {
             return instrucao;
         }
 
-        /* QUASE PRONTO */
-        pair<Flags,Quadrupla> instructionDecoder (bitset<32>instrucao) {
+        /* PRONTO */
+        Sextupla instructionDecoder (bitset<32>instrucao) {
             /* Variáveis */
-            Flags controle;
-            Quadrupla registradores;
-            bitset<8>enderecoFonteA;
-            bitset<8>enderecoFonteB;
+            Sextupla registradores;
+            bitset<8> enderecoFonteA;
+            bitset<8> enderecoFonteB;
             string tipo;
-            
-            for (int i=31; i>=0; i--) {
-                for (int j=7; j>=0; j--, i--) {
-                    registradores.opcode[j] = instrucao[i];
-                }
-
-                for (int j=7; j>=0; j--, i--) {
-                    enderecoFonteA[j] = instrucao[i];
-                }
-
-                for (int j=7; j>=0; j--, i--) {
-                    enderecoFonteB[j] = instrucao[i];
-                }
-
-                for (int j=7; j>=0; j--, i--) {
-                    registradores.registradorC[j] = instrucao[i];
-                }
-            }
 
             tipo = tipoOperacao (registradores.opcode);
 
-            /* controle = {overflow, neg, zero, carry, memRead, memWrite } */
-            if (tipo == "soma") {             
-                controle = {true,true,true,true,false,false};
+            if (tipo == "R") {  
+                for (int i=7; i>=0; i--) {
+                    registradores.opcode[i] = instrucao[i + 24];
+                    enderecoFonteA[i] = instrucao[i + 16];
+                    enderecoFonteB[i] = instrucao[i + 8];
+                    registradores.registradorC[i] = instrucao[i];
+                }    
+                        
                 registradores.registradorA = memoriaProcessador->getValorRegistrador(enderecoFonteA.to_ulong());
                 registradores.registradorB = memoriaProcessador->getValorRegistrador(enderecoFonteB.to_ulong());
             }
 
-            else if (tipo == "zero") {
-                controle = {false,false,true,false,false,false};
-                registradores.registradorA = memoriaProcessador->getValorRegistrador(enderecoFonteA.to_ulong());
-                registradores.registradorB = memoriaProcessador->getValorRegistrador(enderecoFonteB.to_ulong());
+            else if (tipo == "I") {
+                for (int i=7; i>=0; i--) {
+                    registradores.opcode[i] = instrucao[i + 24];
+                    registradores.registradorC[i] = instrucao[i];
+                }
+                for (int i=16; i>=0; i--) {
+                    registradores.constante[i] = instrucao[i + 8];
+                }
             }
 
-            else if (tipo == "logica") {
-                controle = {false,true,true,false,false,false};
-                registradores.registradorA = memoriaProcessador->getValorRegistrador(enderecoFonteA.to_ulong());
-                registradores.registradorB = memoriaProcessador->getValorRegistrador(enderecoFonteB.to_ulong());
-            }
-            else if(tipo == "imediate"){
-                controle = {false,false,false,false,false,false};
-            }
-            else if (tipo == "constante") {
-                controle = {false,false,false,false,false,false};
+            else if (tipo == "J") {
+                for (int i=7; i>=0; i--) {
+                    registradores.opcode[i] = instrucao[i + 24];
+                }
+                for (int i=24; i>=0; i--) {
+                    registradores.endereco[i] = instrucao[i];
+                }
             }
             
-            else if (tipo == "load") {
-                controle = {false,false,false,false,true,false};
-            }
-            
-            else if (tipo == "store") {
-                controle = {false,false,false,false,false,true};
-            }
-            
-            else if (tipo == "jump") {
-                controle = {false,false,false,false,false,false};
-            }
-            
-            else if (tipo == "jr") {
-                controle = {false,false,false,false,false,false};
-            }
-            
-            else if (tipo == "branch") {
-                controle = {false,false,false,false,false,false};
-            }
-            else if (tipo == "halt"){
-                controle = {false,false,false,false,false,false};
-            }
-            return {controle,registradores};
+            return registradores;
         }
 
         /* METADE PRONTO */
-        pair<bitset<8>, bitset<32>> execMemoria (pair<Flags,Quadrupla> decoder) {
-            Flags controle = decoder.first;
-            Quadrupla registradorIDEX = decoder.second;
+        pair<bitset<8>, bitset<32>> execMemoria (Sextupla registradorIDEX) {
             pair<bitset<8>,bitset<32>> resultado;
             bitset<32> result;
 
@@ -257,42 +222,31 @@ class Processador {
 
 /* -- Métodos auxiliares -- */
         string tipoOperacao (bitset<8> opcode) {
-            if (opcode == 0b00000001 or opcode == 0b00000010) {
-                return "soma";
-            }
-            else if (opcode == 0b00000011) {
-                return "zero";
-            }
-            else if (opcode == 0b00000100 or opcode == 0b00000101 or 
-                    opcode == 0b00000110 or opcode == 0b00000111 or 
-                    opcode == 0b00001000 or opcode == 0b00001001 or 
-                    opcode == 0b00001010 or opcode == 0b00001011 or opcode == 0b00001100 or 0b00011101 or 0b00011110) {
-                return "logica";
-            }
-            else if (opcode == 0b00001101 or opcode == 0b00001110) {
-                return "constante";
-            }
-            else if (opcode == 0b0001111) {
-                return "load";
-            }
-            else if (opcode == 0b00010000) {
-                return "store";
-            }
-            else if (opcode == 0b00010001 or opcode == 0b00010101) {
-                return "jump";
-            }
-            else if (opcode == 0b00010010) {
-                return "jr";
-            }
-            else if (opcode == 0b00010011 or opcode == 0b00010100 or 0b00011011 or 0b00011100) {
-                return "branch";
-            }
-            else if (opcode == 0b00010110 or opcode == 0b00010111 or opcode == 0b00011010){
-                return "imediate";
-            }
-            else if(opcode == 0b11111111){
-                return "halt"
-            }
+            map <bitset<8>,string> hashOpcode = {
+                {0b00000001,"R"}, //Add
+                {0b00000010,"R"}, //Sub
+                {0b00000011,"R"}, //Zera
+                {0b00000100,"R"}, //Xor
+                {0b00000101,"R"}, //Or
+                {0b00000110,"R"}, //Not
+                {0b00000111,"R"}, //And
+                {0b00001000,"R"}, //Shift left
+                {0b00001001,"R"}, //Shift Right
+                {0b00001010,"R"}, //Shift Logico Left
+                {0b00001011,"R"}, //Shift Logico Right
+                {0b00001100,"R"}, //Copia ....
+                {0b00001101,"I"}, //lch
+                {0b00001110,"I"}, //lcl
+                {0b00001111,"R"}, //Load
+                {0b00010000,"R"}, //Store
+                {0b00010001,"J"}, //jal
+                {0b00010010,"R"}, //Jr
+                {0b00010011,"R"}, //Beq
+                {0b00010100,"R"}, //Bne
+                {0b00010101,"J"}  //J
+            };
+
+            return hashOpcode[opcode];
         }
 
         bitset<32> complementoDeDois (bitset<32> registrador) {
@@ -355,7 +309,7 @@ class Processador {
 /* -- Método principal-- */
         void executarInstrucoes () {
             bitset<32> registradorIFID;
-            pair<Flags,Quadrupla> registradorIDEX;
+            Sextupla registradorIDEX;
             pair<bitset<8>, bitset<32>> registradorMEMWB;
 
             while (true) {
