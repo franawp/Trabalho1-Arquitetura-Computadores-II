@@ -254,10 +254,45 @@ class Processador {
             else if (tipo == "bgt") { // salte se maior
                 bitset<32> valorDeA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
                 bitset<32> valorDeB = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
-                bitset<32> valorDeC = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorC.to_ulong());
+                bitset<32> valorDeC = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorC.to_ulong()); //endereço
+
+                bool ehMaior; //Caso queira saber se é maior ou não, ou tratar essa informação
+
+                for (int i = valorDeA.size()-1; i >= 0; i--) {
+                    if (valorDeA[i] < valorDeB[i]) {
+                        ehMaior = true;
+                        atualizarContadorPc(valorDeC.to_ulong());
+                        break;
+                    } else if (valorDeA[i] > valorDeB[i]) {
+                        ehMaior = false;
+                        break;
+                    }
+                }
+                
+                resultado = {0b0, 0b0};
+
             }
 
-            else if (tipo == "novo1") {
+            else if (tipo == "blt") {
+                bitset<32> valorDeA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
+                bitset<32> valorDeB = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
+                bitset<32> valorDeC = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorC.to_ulong()); //endereço
+
+                bool ehMaior; //Caso queira saber se é maior ou não, ou tratar essa informação
+
+                for (int i = valorDeA.size()-1; i >= 0; i--) {
+                    if (valorDeA[i] > valorDeB[i]) {
+                        ehMaior = false;
+                        atualizarContadorPc(valorDeC.to_ulong());
+                        break;
+                    } else if (valorDeA[i] < valorDeB[i]) {
+                        ehMaior = true;
+                        break;
+                    }
+                }
+                
+                resultado = {0b0, 0b0};
+                
 
             }
             else if (tipo == "novo1") {
