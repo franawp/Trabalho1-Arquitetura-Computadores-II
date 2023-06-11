@@ -84,15 +84,12 @@ int main () {
     vector<string> listaInstrucoes = abrirArquivo();
     vector<pair<unsigned,bitset<32>>> instrucoes = Interpretador::interpretarInstrucoes(listaInstrucoes);
     
-    /*
-    for (auto i : instrucoes) {
-        cout << i.first << " " << i.second << endl;
-    }
-    */
     Processador *processadorUFLA_RISC;
     processadorUFLA_RISC = new Processador(instrucoes);
 
     processadorUFLA_RISC->executarInstrucoes();
+
+    delete processadorUFLA_RISC;
     
     return 0;
 }

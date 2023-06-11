@@ -43,7 +43,7 @@ class Processador {
             Sextupla registradores;
             string tipo;
 
-            tipo = formatoInstrucao (registradores.opcode);
+            tipo = formatoInstrucao (registradores.opcode.to_ulong());
 
             if (tipo == "R") {
                 for (int i=7; i>=0; i--) {
@@ -80,7 +80,7 @@ class Processador {
         pair<bitset<8>, bitset<32>> execMemoria (Sextupla registradorIDEX) {
             pair<bitset<8>,bitset<32>> resultado;
 
-            pair<string,string> tipo = tipoInstrucao(registradorIDEX.opcode);
+            pair<string,string> tipo = tipoInstrucao(registradorIDEX.opcode.to_ulong());
 
             if (tipo.second == "aritmetica") {
                 return operacaoAritmetica (registradorIDEX, tipo.first);
@@ -102,36 +102,19 @@ class Processador {
                 return operacaoMemoria (registradorIDEX, tipo.first);
             }
 
+            else if (tipo.second == "address") {
+                return {0b0, 0b0};
+            }
+
+            else if (tipo.second == "abortar") {
+                return {0b11111111,0b11111111111111111111111111111111};
+            }
+
             return {0b0,0b0};
-
-            /*
-
-            else if (tipo == "addi") {
-
-            }
-            else if (tipo == "subi") {
-
-            }
-            else if (tipo == "andi") {
-
-            }
-            else if (tipo == "ori") {
-
-            }
-            else if (tipo == "halt") {
-
-            }
-            else if (tipo == "adress") {
-
-            }
-            */
-
-            return resultado;
         }
 
         /* PRONTO */
         void writeBack (pair<bitset<8>, bitset<32>> dados) {
-            /* Adicionar Flag RegWrite */
             memoriaProcessador->escritaBancoRegistradores(dados.second,dados.first.to_ulong());
         }
 
@@ -243,7 +226,7 @@ class Processador {
         }
 
         pair<bitset<8>,bitset<32>> operacaoBranch (Sextupla registradorIDEX, string tipo) {
-            if (tipo == "jal") { //pronto
+            if (tipo == "jal") {
                 bitset<32> contadorPCAtual (contadorPC + 1);
                 bitset<8> registrador31 (31);
 
@@ -252,14 +235,14 @@ class Processador {
                 atualizarContadorPc(registradorIDEX.endereco.to_ulong());
             }
 
-            else if (tipo == "jr") { //pronto
+            else if (tipo == "jr") {
                 bitset<32> conteudoRc = memoriaProcessador->getValorRegistrador(31);
                 atualizarContadorPc(conteudoRc.to_ulong());
 
                 return {0b0, 0b0};
             }
 
-            else if (tipo == "beq") { //pronto
+            else if (tipo == "beq") {
                 bitset<32> zero(0b0);
                 bitset<32> valorDeA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
                 bitset<32> valorDeB = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
@@ -336,11 +319,24 @@ class Processador {
 
         pair<bitset<8>,bitset<32>> operacaoShift (Sextupla registradorIDEX, string tipo) {
             if (tipo == "asl") { 
+                bitset<32> valorB = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
+                bitset<32> valorA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
                 
+                return {registradorIDEX.numeroRegistradorC, valorA << valorB.to_ulong()};
             }
 
             else if (tipo == "asr") {
-                
+                bitset<32> valorB = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
+                bitset<32> valorA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
+                bool ultimoBit = valorA[31];
+
+                bitset<32> novoValor (valorA >> valorB.to_ullong());
+
+                for (int i=31, j=0; j<valorB.to_ulong(); j++, i--) {
+                    novoValor[i] = ultimoBit;
+                }
+
+                return {registradorIDEX.numeroRegistradorC , novoValor};
             }
 
             else if (tipo == "lsl") {
@@ -378,10 +374,39 @@ class Processador {
 
                 return {registradorIDEX.numeroRegistradorC, valor};
             }
+
+            else if (tipo == "addi") {
+                bitset<32> valorB = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
+                bitset<32> valorA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
+                
+                return {registradorIDEX.numeroRegistradorC, somaBinaria(valorA,valorB).second};
+            }
+
+            else if (tipo == "subi") {
+                bitset<32> valorB = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
+                bitset<32> valorA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
+                
+                return {registradorIDEX.numeroRegistradorC, subtracaoBinaria(valorA,valorB).second};
+            }
+
+            else if (tipo == "andi") {
+                bitset<32> valorDeA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
+                bitset<32> constante = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
+
+                return {registradorIDEX.numeroRegistradorC,(valorDeA & constante)};
+            }
+
+            else if (tipo == "ori") {
+                bitset<32> valorDeA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
+                bitset<32> constante = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
+
+                return {registradorIDEX.numeroRegistradorC,(valorDeA | constante)};
+            }
         }
 
-        pair<string,string> tipoInstrucao (bitset<8> opcode) {
-            map <bitset<8>,pair<string,string>> hashInstrucao = {
+        pair<string,string> tipoInstrucao (uint8_t opcode) {
+            map <uint8_t,pair<string,string>> hashInstrucao = {
+                {0b00000000,{"address","label"}},
                 {0b00000001,{"add","aritmetica"}},
                 {0b00000010,{"sub","aritmetica"}},
                 {0b00000011,{"zeros","aritmetica"}},
@@ -422,8 +447,9 @@ class Processador {
             return hashInstrucao[opcode];
         }
 
-        string formatoInstrucao (bitset<8> opcode) {
-            map <bitset<8>,string> hashOpcode = {
+        string formatoInstrucao (uint8_t opcode) {
+            map <uint8_t,string> hashOpcode = {
+                {0b00000000,"E"},  //Address
                 {0b00000001,"R"}, //Add
                 {0b00000010,"R"}, //Sub
                 {0b00000011,"R"}, //Zera
