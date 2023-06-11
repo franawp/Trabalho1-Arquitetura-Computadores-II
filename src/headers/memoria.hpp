@@ -31,9 +31,18 @@ class Memoria {
             return memoriaInstrucoes[endereco].second;
         }
 
-        void escritaMemoriaDados (bitset<16> dado, unsigned posicao) {
-            memoriaDados[posicao].first = true;
-            memoriaDados[posicao].second = dado;
+        void escritaMemoriaDados (bitset<16> dado, unsigned endereco) {
+            memoriaDados[endereco].first = true;
+            memoriaDados[endereco].second = dado;
+        }
+
+        bitset<16> getMemoriaDados (unsigned endereco) {
+            if (memoriaDados[endereco].first) {
+                return memoriaDados[endereco].second;
+            }
+            else {
+                return 0b0;
+            }
         }
 
 /* -- Métodos que envolvem o banco de registradores --*/

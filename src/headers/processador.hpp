@@ -43,9 +43,10 @@ class Processador {
             bitset<8> enderecoFonteB;
             string tipo;
 
-            tipo = tipoOperacao (registradores.opcode);
+            tipo = formatoInstrucao (registradores.opcode);
 
             if (tipo == "R") {  
+                /* Verificar a porra da inversão do Load e store */
                 for (int i=7; i>=0; i--) {
                     registradores.opcode[i] = instrucao[i + 24];
                     enderecoFonteA[i] = instrucao[i + 16];
@@ -84,7 +85,9 @@ class Processador {
             pair<bitset<8>,bitset<32>> resultado;
             bitset<32> result;
 
-            if (registradorIDEX.opcode == 0b00000001) { // Instrução de ADD
+            string tipo = tipoInstrucao(registradorIDEX.opcode);
+
+            if (tipo == "add") { // Pronto
                 pair<bool,bitset<32>> soma = somaBinaria(registradorIDEX.registradorA,registradorIDEX.registradorB);
                 
                 if (soma.first) {
@@ -95,117 +98,139 @@ class Processador {
                 }
             }
 
-            else if (registradorIDEX.opcode == 0b00000010) {
-                somaBinaria(registradorIDEX.registradorA, complementoDeDois(registradorIDEX.registradorB));
+            else if (tipo == "sub") { //Pronto
+            /* fazer metodo Sub */
+                pair<bool,bitset<32>> sub = subtracaoBinaria(registradorIDEX.registradorA,registradorIDEX.registradorB);
+                
+                if (sub.first) {
+                    /* flag de overflow */
+                }
+                else {
+                    result = sub.second;
+                }
             }
 
-            else if (registradorIDEX.opcode == 0b00000011) {
-
+            else if (tipo == "zeros") { //Pronto
+                result = 0b0;
             }
 
-            else if (registradorIDEX.opcode == 0b00000100) {
+            else if (tipo == "xor") { //Pronto
                 result = registradorIDEX.registradorA ^ registradorIDEX.registradorB;
             }
 
-            else if (registradorIDEX.opcode == 0b00000101) {
+            else if (tipo == "or") { //Pronto
                 result = registradorIDEX.registradorA | registradorIDEX.registradorB;
             }
 
-            else if (registradorIDEX.opcode == 0b00000110) {
+            else if (tipo == "passnota") { //Pronto
                 result = ~registradorIDEX.registradorA;
             }
 
-            else if (registradorIDEX.opcode == 0b00000111) {
+            else if (tipo == "and") { //Pronto
                 result = registradorIDEX.registradorA & registradorIDEX.registradorB;
 
             }
 
-            else if (registradorIDEX.opcode == 0b00001000) { // shift aritmetico para a esquerda
+            else if (tipo == "asl") { 
                 
             }
 
-            else if (registradorIDEX.opcode == 0b00001001) {
+            else if (tipo == "asr") {
 
             }
 
-            else if (registradorIDEX.opcode == 0b00001010) {
+            else if (tipo == "lsl") {
 
             }
 
-            else if (registradorIDEX.opcode == 0b00001011) {
+            else if (tipo == "lsr") {
 
             }
 
-            else if (registradorIDEX.opcode == 0b00001100) { //copia
-                //move(registradorA, registradorB)
+            else if (tipo == "passa") { //copia
+                move(registradorIDEX.registradorA, registradorIDEX.registradorB);
             }
 
-            else if (registradorIDEX.opcode == 0b00001101) {
-
-            }
-
-            else if (registradorIDEX.opcode == 0b00001110) {
+            else if (tipo == "lch") {
 
             }
 
-            else if (registradorIDEX.opcode == 0b00001111) {
+            else if (tipo == "lcl") {
 
             }
 
-            else if (registradorIDEX.opcode == 0b00010000) { //load
-
+            else if (tipo == "load") {
+                bitset<32> dado (memoriaProcessador->getMemoriaDados(registradorIDEX.registradorA.to_ullong()).to_ullong());
+                result = dado;
             }
 
-            else if (registradorIDEX.opcode == 0b00010001) { //store
-
+            else if (tipo == "store") { 
+                memoriaProcessador->escritaMemoriaDados(registradorIDEX.registradorC.to_ulong(),registradorIDEX.registradorA.to_ulong());
             }
 
-            else if (registradorIDEX.opcode == 0b00010010) {
+            else if (tipo == "jal") {
+                bitset<32> contadorPCAtual (contadorPC + 1);
+                result = contadorPCAtual;
+                bitset<8> registrador31 (31);
+                resultado.first = registrador31;
 
+                atualizarContadorPc(registradorIDEX.endereco.to_ulong());
             }
 
-            else if (registradorIDEX.opcode == 0b00010011) {
-
+            else if (tipo == "jr") {
+                bitset<32> conteudoRc = memoriaProcessador->getValorRegistrador(31);
+                atualizarContadorPc(conteudoRc.to_ulong());
             }
 
-            else if (registradorIDEX.opcode == 0b00010100) {
-
+            else if (tipo == "beq") {
+                bitset<32> zero(0b0);
+                if (subtracaoBinaria(registradorIDEX.registradorA,registradorIDEX.registradorB).second == zero) {
+                    atualizarContadorPc(registradorIDEX.registradorC.to_ulong());
+                }
             }
 
-            else if (registradorIDEX.opcode == 0b00010101) {
+            else if (tipo == "bne") {
+                bitset<32> zero(0b0);
+                if (subtracaoBinaria(registradorIDEX.registradorA,registradorIDEX.registradorB).second != zero) {
+                    atualizarContadorPc(registradorIDEX.registradorC.to_ulong());
+                }
+            }
+
+            else if (tipo == "j") {
+                atualizarContadorPc(registradorIDEX.endereco.to_ulong());
+            }
+
+            else if (tipo == "novo1") {
 
             }
-            else if (registradorIDEX.opcode == 0b00010110) {
+            else if (tipo == "novo1") {
 
             }
-            else if (registradorIDEX.opcode == 0b00010111) {
+            else if (tipo == "novo1") {
 
             }
-            else if (registradorIDEX.opcode == 0b00011000) {
+            else if (tipo == "novo1") {
 
             }
-            else if (registradorIDEX.opcode == 0b00011001) {
+            else if (tipo == "novo1") {
 
             }
-            else if (registradorIDEX.opcode == 0b00010101) {
+            else if (tipo == "novo1") {
 
             }
-            else if (registradorIDEX.opcode == 0b00011010) {
+            else if (tipo == "novo1") {
 
             }
-            else if (registradorIDEX.opcode == 0b00011011) {
+            else if (tipo == "novo1") {
 
             }
-            else if (registradorIDEX.opcode == 0b00011100) {
+            else if (tipo == "novo1") {
 
             }
-            else if (registradorIDEX.opcode == 0b00011101) {
+            else if (tipo == "novo1") {
 
             }
-            else if (registradorIDEX.opcode == 0b00011110) {
-
-            }
-            else if (registradorIDEX.opcode == 0b00011111) {
+            else if (tipo == "novo1") {
 
             }
 
@@ -221,7 +246,35 @@ class Processador {
         }
 
 /* -- Métodos auxiliares -- */
-        string tipoOperacao (bitset<8> opcode) {
+        string tipoInstrucao (bitset<8> opcode) {
+            map <bitset<8>,string> hashInstrucao = {
+                {0b00000001,"add"},
+                {0b00000010,"sub"},
+                {0b00000011,"zeros"},
+                {0b00000100,"xor"},
+                {0b00000101,"or"},
+                {0b00000110,"passnota"},
+                {0b00000111,"and"},
+                {0b00001000,"asl"},
+                {0b00001001,"asr"},
+                {0b00001010,"lsl"},
+                {0b00001011,"lsr"},
+                {0b00001100,"passa"},
+                {0b00001101,"lch"},
+                {0b00001110,"lcl"},
+                {0b00001111,"load"},
+                {0b00010000,"store"},
+                {0b00010001,"jal"},
+                {0b00010010,"jr"},
+                {0b00010011,"beq"},
+                {0b00010100,"bne"},
+                {0b00010101,"j"}
+            };
+
+            return hashInstrucao[opcode];
+        }
+
+        string formatoInstrucao (bitset<8> opcode) {
             map <bitset<8>,string> hashOpcode = {
                 {0b00000001,"R"}, //Add
                 {0b00000010,"R"}, //Sub
@@ -295,6 +348,14 @@ class Processador {
             }
 
             return {overflow,resultado};
+        }
+
+        pair<bool,bitset<32>> subtracaoBinaria (bitset<32> registrador1, bitset<32> registrador2) {
+            return somaBinaria(registrador1,complementoDeDois(registrador2));
+        }
+
+        void atualizarContadorPc (unsigned novoContador) {
+            contadorPC = novoContador;
         }
 
         //copy
