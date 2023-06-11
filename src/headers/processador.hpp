@@ -14,9 +14,11 @@ struct Flags {
 
 struct Sextupla {
     bitset<8> opcode;
-    bitset<32> registradorA;
-    bitset<32> registradorB;
-    bitset<8> registradorC;
+
+    bitset<8> numeroRegistradorA;
+    bitset<8> numeroRegistradorB;
+    bitset<8> numeroRegistradorC;
+
     bitset<16> constante;
     bitset<24> endereco;
 };
@@ -39,29 +41,23 @@ class Processador {
         Sextupla instructionDecoder (bitset<32>instrucao) {
             /* Variáveis */
             Sextupla registradores;
-            bitset<8> enderecoFonteA;
-            bitset<8> enderecoFonteB;
             string tipo;
 
             tipo = formatoInstrucao (registradores.opcode);
 
-            if (tipo == "R") {  
-                /* Verificar a porra da inversão do Load e store */
+            if (tipo == "R") {
                 for (int i=7; i>=0; i--) {
                     registradores.opcode[i] = instrucao[i + 24];
-                    enderecoFonteA[i] = instrucao[i + 16];
-                    enderecoFonteB[i] = instrucao[i + 8];
-                    registradores.registradorC[i] = instrucao[i];
+                    registradores.numeroRegistradorA[i] = instrucao[i + 16];
+                    registradores.numeroRegistradorB[i] = instrucao[i + 8];
+                    registradores.numeroRegistradorC[i] = instrucao[i];
                 }    
-                        
-                registradores.registradorA = memoriaProcessador->getValorRegistrador(enderecoFonteA.to_ulong());
-                registradores.registradorB = memoriaProcessador->getValorRegistrador(enderecoFonteB.to_ulong());
             }
 
             else if (tipo == "I") {
                 for (int i=7; i>=0; i--) {
                     registradores.opcode[i] = instrucao[i + 24];
-                    registradores.registradorC[i] = instrucao[i];
+                    registradores.numeroRegistradorC[i] = instrucao[i];
                 }
                 for (int i=16; i>=0; i--) {
                     registradores.constante[i] = instrucao[i + 8];
@@ -83,52 +79,64 @@ class Processador {
         /* METADE PRONTO */
         pair<bitset<8>, bitset<32>> execMemoria (Sextupla registradorIDEX) {
             pair<bitset<8>,bitset<32>> resultado;
-            bitset<32> result;
 
             string tipo = tipoInstrucao(registradorIDEX.opcode);
 
             if (tipo == "add") { // Pronto
-                pair<bool,bitset<32>> soma = somaBinaria(registradorIDEX.registradorA,registradorIDEX.registradorB);
+                bitset<32> valorDeA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
+                bitset<32> valorDeB = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
+                pair<bool,bitset<32>> soma = somaBinaria(valorDeA,valorDeB);
                 
                 if (soma.first) {
                     /* flag de overflow */
                 }
                 else {
-                    result = soma.second;
+                    resultado = {registradorIDEX.numeroRegistradorC,soma.second};
                 }
             }
 
             else if (tipo == "sub") { //Pronto
-            /* fazer metodo Sub */
-                pair<bool,bitset<32>> sub = subtracaoBinaria(registradorIDEX.registradorA,registradorIDEX.registradorB);
+                bitset<32> valorDeA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
+                bitset<32> valorDeB = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
+                pair<bool,bitset<32>> sub = subtracaoBinaria(valorDeA,valorDeB);
                 
                 if (sub.first) {
                     /* flag de overflow */
                 }
                 else {
-                    result = sub.second;
+                    resultado = {registradorIDEX.numeroRegistradorC,sub.second};
                 }
             }
 
             else if (tipo == "zeros") { //Pronto
-                result = 0b0;
+                resultado = {registradorIDEX.numeroRegistradorC,0b0};
             }
 
             else if (tipo == "xor") { //Pronto
-                result = registradorIDEX.registradorA ^ registradorIDEX.registradorB;
+                bitset<32> valorDeA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
+                bitset<32> valorDeB = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
+
+                resultado = {registradorIDEX.numeroRegistradorC,(valorDeA ^ valorDeB)};
             }
 
             else if (tipo == "or") { //Pronto
-                result = registradorIDEX.registradorA | registradorIDEX.registradorB;
+                bitset<32> valorDeA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
+                bitset<32> valorDeB = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
+
+                resultado = {registradorIDEX.numeroRegistradorC,(valorDeA | valorDeB)};
             }
 
             else if (tipo == "passnota") { //Pronto
-                result = ~registradorIDEX.registradorA;
+                bitset<32> valorDeA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
+
+                resultado = {registradorIDEX.numeroRegistradorC, ~valorDeA};
             }
 
             else if (tipo == "and") { //Pronto
-                result = registradorIDEX.registradorA & registradorIDEX.registradorB;
+                bitset<32> valorDeA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
+                bitset<32> valorDeB = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
 
+                resultado = {registradorIDEX.numeroRegistradorC,(valorDeA & valorDeB)};
             }
 
             else if (tipo == "asl") { 
@@ -148,58 +156,107 @@ class Processador {
             }
 
             else if (tipo == "passa") { //copia
-                move(registradorIDEX.registradorA, registradorIDEX.registradorB);
+                //move(registradorIDEX.registradorA, registradorIDEX.registradorB);
             }
 
             else if (tipo == "lch") {
-
+                
             }
 
             else if (tipo == "lcl") {
 
             }
 
-            else if (tipo == "load") {
-                bitset<32> dado (memoriaProcessador->getMemoriaDados(registradorIDEX.registradorA.to_ullong()).to_ullong());
-                result = dado;
+            else if (tipo == "load") { //pronto
+                bitset<32> endereco = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
+                bitset<32> dado (memoriaProcessador->getMemoriaDados(endereco.to_ulong()).to_ulong());
+                
+                resultado = {registradorIDEX.numeroRegistradorC, dado};
             }
 
-            else if (tipo == "store") { 
-                memoriaProcessador->escritaMemoriaDados(registradorIDEX.registradorC.to_ulong(),registradorIDEX.registradorA.to_ulong());
+            else if (tipo == "store") { //pronto
+                bitset<16> dado (memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorC.to_ulong()).to_ulong());
+                
+                memoriaProcessador->escritaMemoriaDados(dado,registradorIDEX.numeroRegistradorA.to_ulong());
+
+                resultado = {0b0, 0b0};
             }
 
-            else if (tipo == "jal") {
+            else if (tipo == "jal") { //pronto
                 bitset<32> contadorPCAtual (contadorPC + 1);
-                result = contadorPCAtual;
                 bitset<8> registrador31 (31);
-                resultado.first = registrador31;
+
+                resultado = {registrador31,contadorPCAtual};
 
                 atualizarContadorPc(registradorIDEX.endereco.to_ulong());
             }
 
-            else if (tipo == "jr") {
+            else if (tipo == "jr") { //pronto
                 bitset<32> conteudoRc = memoriaProcessador->getValorRegistrador(31);
                 atualizarContadorPc(conteudoRc.to_ulong());
+
+                resultado = {0b0, 0b0};
             }
 
-            else if (tipo == "beq") {
+            else if (tipo == "beq") { //pronto
                 bitset<32> zero(0b0);
-                if (subtracaoBinaria(registradorIDEX.registradorA,registradorIDEX.registradorB).second == zero) {
-                    atualizarContadorPc(registradorIDEX.registradorC.to_ulong());
+                bitset<32> valorDeA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
+                bitset<32> valorDeB = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
+                bitset<32> valorDeC = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorC.to_ulong());
+
+                if (subtracaoBinaria(valorDeA, valorDeB).second == zero) {
+                    atualizarContadorPc (valorDeC.to_ulong());
                 }
+
+                resultado = {0b0,0b0};
             }
 
-            else if (tipo == "bne") {
+            else if (tipo == "bne") { //pronto
                 bitset<32> zero(0b0);
-                if (subtracaoBinaria(registradorIDEX.registradorA,registradorIDEX.registradorB).second != zero) {
-                    atualizarContadorPc(registradorIDEX.registradorC.to_ulong());
+                bitset<32> valorDeA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
+                bitset<32> valorDeB = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
+                bitset<32> valorDeC = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorC.to_ulong());
+
+                if (subtracaoBinaria(valorDeA, valorDeB).second != zero) {
+                    atualizarContadorPc (valorDeC.to_ulong());
                 }
+
+                resultado = {0b0,0b0};
             }
 
-            else if (tipo == "j") {
+            else if (tipo == "j") { //pronto
                 atualizarContadorPc(registradorIDEX.endereco.to_ulong());
+
+                resultado = {0b0, 0b0};
             }
 
+            else if (tipo == "nand") {
+                bitset<32> valorDeA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
+                bitset<32> valorDeB = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
+
+                resultado = {registradorIDEX.numeroRegistradorC,~(valorDeA & valorDeB)};
+            }
+            else if (tipo == "xnor") {
+                bitset<32> valorDeA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
+                bitset<32> valorDeB = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
+
+                resultado = {registradorIDEX.numeroRegistradorC, ~(valorDeA ^ valorDeB)};
+            }
+            else if (tipo == "nor") {
+                bitset<32> valorDeA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
+                bitset<32> valorDeB = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
+
+                resultado = {registradorIDEX.numeroRegistradorC,~(valorDeA | valorDeB)};
+            }
+            else if (tipo == "novo1") {
+
+            }
+            else if (tipo == "novo1") {
+
+            }
+            else if (tipo == "novo1") {
+
+            }
             else if (tipo == "novo1") {
 
             }
@@ -215,26 +272,6 @@ class Processador {
             else if (tipo == "novo1") {
 
             }
-            else if (tipo == "novo1") {
-
-            }
-            else if (tipo == "novo1") {
-
-            }
-            else if (tipo == "novo1") {
-
-            }
-            else if (tipo == "novo1") {
-
-            }
-            else if (tipo == "novo1") {
-
-            }
-            else if (tipo == "novo1") {
-
-            }
-
-            resultado.second = result;
 
             return resultado;
         }
@@ -335,7 +372,7 @@ class Processador {
                 }
                 else if (registrador1[i] & registrador2[i] || registrador2[i] & carry[0] || registrador1[i] & carry[0]) {
                     resultado[i] = 0b0;
-                    carry = 0b0;
+                    carry = 0b1;
                 }
                 else if (registrador1[i] | registrador2[i] || registrador2[i] | carry[0] || registrador1[i] | carry[0]) {
                     resultado[i] = 0b1;
