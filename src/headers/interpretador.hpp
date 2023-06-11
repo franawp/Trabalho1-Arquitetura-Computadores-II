@@ -188,6 +188,7 @@ map<string,bitset<8>> Interpretador::hashOpcode = {
     {"xnor", 0b00011010},
     {"addi", 0b00011011},
     {"subi", 0b00011100},
-    {"mult", 0b00011101},
+    {"andi", 0b00011101},
+    {"ori", 0b00011110},
     {"halt", 0b11111111}
 };
