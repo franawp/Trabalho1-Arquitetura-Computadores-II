@@ -42,6 +42,17 @@ class Interpretador {
 
             tipoInstrucao = qTipoInstrucao(instrucao);
 
+            try {
+                if (hashOpcode.find(instrucao[0]) == hashOpcode.end()) {
+                    throw runtime_error("Chave: " + instrucao[0] + " não encontrada");
+                }
+            }
+            catch (const exception &error) {
+                cout << error.what() << endl;
+                cout << "abortando a execução\n";
+                exit(-1);
+            }
+
             if (tipoInstrucao == "R") {
                 if (instrucao.size() == 4) {
                     bitset<8> opcode(hashOpcode[instrucao[0]]);
@@ -148,20 +159,35 @@ class Interpretador {
 };
 
 map<string,bitset<8>> Interpretador::hashOpcode = {
-    {"add", 0b00000001}, {"sub", 0b00000010},
-    {"zeros", 0b00000011}, {"xor", 0b00000100},
-    {"or", 0b00000101}, {"passnota", 0b00000110},
-    {"and", 0b00000111},{"asl", 0b00001000},
-    {"asr", 0b00001001},{"lsl", 0b00001010},
-    {"lsr", 0b00001011},{"passa", 0b00001100},
-    {"lch", 0b00001110},{"lcl", 0b00001111},
-    {"load", 0b00010000},{"store", 0b00010001},
-    {"jal", 0b00010010},{"jr", 0b00010011},
-    {"beq", 0b00010100},{"bne", 0b00010101},
-    {"j", 0b00010110},{"nova1", 0b11},
-    {"nova2", 0b11},{"nova3", 0b11},
-    {"nova4", 0b11},{"nova5", 0b11},
-    {"nova6", 0b11},{"nova7", 0b11},
-    {"nova8", 0b11},{"nova9", 0b11},
-    {"nova10", 0b11},{"halt", 0b11111111}   
+    {"adress", 0b00000000},
+    {"add", 0b00000001},
+    {"sub", 0b00000010},
+    {"zeros", 0b00000011},
+    {"xor", 0b00000100},
+    {"or", 0b00000101},
+    {"passnota", 0b00000110},
+    {"and", 0b00000111},
+    {"asl", 0b00001000},
+    {"asr", 0b00001001},
+    {"lsl", 0b00001010},
+    {"lsr", 0b00001011},
+    {"passa", 0b00001100},
+    {"lch", 0b00001101},
+    {"lcl", 0b00001110},
+    {"load", 0b00001111},
+    {"store", 0b00010000},
+    {"jal", 0b00010001},
+    {"jr", 0b00010010},
+    {"beq", 0b00010011},
+    {"bne", 0b00010100},
+    {"j", 0b00010101},
+    {"bgt", 0b00010110},
+    {"blt", 0b00010111},
+    {"nand", 0b00011000},
+    {"nor", 0b00011001},
+    {"xnor", 0b00011010},
+    {"addi", 0b00011011},
+    {"subi", 0b00011100},
+    {"mult", 0b00011101},
+    {"halt", 0b11111111}
 };

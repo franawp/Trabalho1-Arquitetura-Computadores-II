@@ -106,22 +106,22 @@ class Processador {
 
             /*
 
-            else if (tipo == "novo1") {
+            else if (tipo == "addi") {
 
             }
-            else if (tipo == "novo1") {
+            else if (tipo == "subi") {
 
             }
-            else if (tipo == "novo1") {
+            else if (tipo == "andi") {
 
             }
-            else if (tipo == "novo1") {
+            else if (tipo == "ori") {
 
             }
-            else if (tipo == "novo1") {
+            else if (tipo == "halt") {
 
             }
-            else if (tipo == "novo1") {
+            else if (tipo == "adress") {
 
             }
             */
@@ -360,11 +360,23 @@ class Processador {
 
         pair<bitset<8>,bitset<32>> operacaoConstante (Sextupla registradorIDEX, string tipo) {
             if (tipo == "lch") {
-                
+                bitset<32> valor;
+
+                for (int i=15; i>=0; i++) {
+                    valor[i] = registradorIDEX.constante[i];
+                }
+
+                return {registradorIDEX.numeroRegistradorC, valor};
             }
 
             else if (tipo == "lcl") {
+                bitset<32> valor;
 
+                for (int i=0; i<16; i++) {
+                    valor[i] = registradorIDEX.constante[i];
+                }
+
+                return {registradorIDEX.numeroRegistradorC, valor};
             }
         }
 
@@ -382,16 +394,30 @@ class Processador {
                 {0b00001010,{"lsl","shift"}},
                 {0b00001011,{"lsr","shift"}},
                 {0b00001100,{"passa","aritmetica"}},
-                {0b00001101,{"lch","NAO SEI"}},
-                {0b00001110,{"lcl","NAO SEI"}},
+                {0b00001101,{"lch","constante"}},
+                {0b00001110,{"lcl","constante"}},
                 {0b00001111,{"load","memoria"}},
                 {0b00010000,{"store","memoria"}},
                 {0b00010001,{"jal","branch"}},
                 {0b00010010,{"jr","branch"}},
                 {0b00010011,{"beq","branch"}},
                 {0b00010100,{"bne","branch"}},
-                {0b00010101,{"j","branch"}}
+                {0b00010101,{"j","branch"}},
+                {0b00010110,{"bgt","branch"}},
+                {0b00010111,{"blt","branch"}},
+                {0b00011000,{"nand","logica"}},
+                {0b00011001,{"nor","logica"}},
+                {0b00011010,{"xnor","logica"}},
+                {0b00011011,{"addi","constante"}},
+                {0b00011100,{"subi","constante"}},
+                {0b00011101,{"andi","constante"}},
+                {0b00011110,{"ori","contante"}},
+                {0b11111111,{"halt","abortar"}} 
             };
+
+            if (hashInstrucao.find(opcode) == hashInstrucao.end()) {
+                return {"",""};
+            }
 
             return hashInstrucao[opcode];
         }
@@ -418,27 +444,29 @@ class Processador {
                 {0b00010010,"R"}, //Jr
                 {0b00010011,"R"}, //Beq
                 {0b00010100,"R"}, //Bne
-                {0b00010101,"J"}  //J
+                {0b00010101,"J"}, //J
+                {0b00010110,"R"}, //bgt
+                {0b00010111,"R"}, //blt
+                {0b00011000,"R"}, //nand
+                {0b00011001,"R"}, //nor
+                {0b00011010,"R"}, //xnor
+                {0b00011011,"I"}, //addi
+                {0b00011100,"I"}, //subi
+                {0b00011101,"R"}, //mult
+                {0b11111111,"J"} //halt
             };
+
+
+            if (hashOpcode.find(opcode) == hashOpcode.end()) {
+                return "X";
+            }
 
             return hashOpcode[opcode];
         }
 
         bitset<32> complementoDeDois (bitset<32> registrador) {
             registrador.flip();
-            bool carry = 1;
-            int i = 0;
-
-            while (carry) {
-                if (!registrador[i]) {
-                    registrador[i] = 0b1;
-                    carry = 0;
-                }
-                else {
-                    registrador[i] = 0b0;
-                }
-                i++;
-            }
+            return somaBinaria(registrador,0b1).second;
         }
 
         pair<bool,bitset<32>> somaBinaria (bitset<32> registrador1, bitset<32> registrador2) {
