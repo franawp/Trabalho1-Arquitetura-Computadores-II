@@ -230,27 +230,33 @@ class Processador {
                 resultado = {0b0, 0b0};
             }
 
-            else if (tipo == "nand") {
+            else if (tipo == "nand") { //pronto
                 bitset<32> valorDeA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
                 bitset<32> valorDeB = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
 
                 resultado = {registradorIDEX.numeroRegistradorC,~(valorDeA & valorDeB)};
             }
-            else if (tipo == "xnor") {
+
+            else if (tipo == "xnor") { //pronto
                 bitset<32> valorDeA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
                 bitset<32> valorDeB = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
 
                 resultado = {registradorIDEX.numeroRegistradorC, ~(valorDeA ^ valorDeB)};
             }
-            else if (tipo == "nor") {
+
+            else if (tipo == "nor") { //pronto
                 bitset<32> valorDeA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
                 bitset<32> valorDeB = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
 
                 resultado = {registradorIDEX.numeroRegistradorC,~(valorDeA | valorDeB)};
             }
-            else if (tipo == "novo1") {
 
+            else if (tipo == "bgt") { // salte se maior
+                bitset<32> valorDeA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
+                bitset<32> valorDeB = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
+                bitset<32> valorDeC = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorC.to_ulong());
             }
+
             else if (tipo == "novo1") {
 
             }
