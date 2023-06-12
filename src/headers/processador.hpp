@@ -43,11 +43,15 @@ class Processador {
             Sextupla registradores;
             string tipo;
 
+            for (int i=31, j=7; i>=24; i--, j--) {
+                registradores.opcode[j] = instrucao[i];
+            }
+
             tipo = formatoInstrucao (registradores.opcode.to_ulong());
+
 
             if (tipo == "R") {
                 for (int i=7; i>=0; i--) {
-                    registradores.opcode[i] = instrucao[i + 24];
                     registradores.numeroRegistradorA[i] = instrucao[i + 16];
                     registradores.numeroRegistradorB[i] = instrucao[i + 8];
                     registradores.numeroRegistradorC[i] = instrucao[i];
@@ -56,7 +60,6 @@ class Processador {
 
             else if (tipo == "I") {
                 for (int i=7; i>=0; i--) {
-                    registradores.opcode[i] = instrucao[i + 24];
                     registradores.numeroRegistradorC[i] = instrucao[i];
                 }
                 for (int i=16; i>=0; i--) {
@@ -65,9 +68,6 @@ class Processador {
             }
 
             else if (tipo == "J") {
-                for (int i=7; i>=0; i--) {
-                    registradores.opcode[i] = instrucao[i + 24];
-                }
                 for (int i=24; i>=0; i--) {
                     registradores.endereco[i] = instrucao[i];
                 }
@@ -78,7 +78,6 @@ class Processador {
 
         /* METADE PRONTO */
         pair<bitset<8>, bitset<32>> execMemoria (Sextupla registradorIDEX) {
-            pair<bitset<8>,bitset<32>> resultado;
 
             pair<string,string> tipo = tipoInstrucao(registradorIDEX.opcode.to_ulong());
 
@@ -100,6 +99,11 @@ class Processador {
 
             else if (tipo.second == "memoria") {
                 return operacaoMemoria (registradorIDEX, tipo.first);
+            }
+
+            else if (tipo.second == "constante") {
+                cout << "registradores: " << registradorIDEX.numeroRegistradorA << endl; 
+                return operacaoConstante (registradorIDEX, tipo.first);
             }
 
             else if (tipo.second == "address") {
@@ -376,10 +380,11 @@ class Processador {
             }
 
             else if (tipo == "addi") {
-                bitset<32> valorB = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
+                bitset<32> constante (registradorIDEX.numeroRegistradorB.to_ulong());
+                cout << "constante: " << constante << endl;
                 bitset<32> valorA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
-                
-                return {registradorIDEX.numeroRegistradorC, somaBinaria(valorA,valorB).second};
+                cout << "valor a: " << valorA << endl;
+                return {registradorIDEX.numeroRegistradorC, somaBinaria(valorA,constante).second};
             }
 
             else if (tipo == "subi") {
@@ -402,10 +407,14 @@ class Processador {
 
                 return {registradorIDEX.numeroRegistradorC,(valorDeA | constante)};
             }
+
+            else {
+                cout << "nao me acharo :(" << endl;
+            }
         }
 
-        pair<string,string> tipoInstrucao (uint8_t opcode) {
-            map <uint8_t,pair<string,string>> hashInstrucao = {
+        pair<string,string> tipoInstrucao (unsigned opcode) {
+            map <unsigned,pair<string,string>> hashInstrucao = {
                 {0b00000000,{"address","label"}},
                 {0b00000001,{"add","aritmetica"}},
                 {0b00000010,{"sub","aritmetica"}},
@@ -447,8 +456,8 @@ class Processador {
             return hashInstrucao[opcode];
         }
 
-        string formatoInstrucao (uint8_t opcode) {
-            map <uint8_t,string> hashOpcode = {
+        string formatoInstrucao (unsigned opcode) {
+            map <unsigned,string> hashOpcode = {
                 {0b00000000,"E"},  //Address
                 {0b00000001,"R"}, //Add
                 {0b00000010,"R"}, //Sub
@@ -476,10 +485,10 @@ class Processador {
                 {0b00011000,"R"}, //nand
                 {0b00011001,"R"}, //nor
                 {0b00011010,"R"}, //xnor
-                {0b00011011,"I"}, //addi
-                {0b00011100,"I"}, //subi
-                {0b00011101,"I"}, //andi
-                {0b00011110,"I"}, //ori
+                {0b00011011,"R"}, //addi
+                {0b00011100,"R"}, //subi
+                {0b00011101,"R"}, //andi
+                {0b00011110,"R"}, //ori
                 {0b11111111,"J"}  //halt
             };
 
@@ -543,7 +552,7 @@ class Processador {
         }
 
         ~Processador () {
-            delete[] memoriaProcessador;
+            delete memoriaProcessador;
         }
 /* -- Método principal-- */
         void executarInstrucoes () {
@@ -553,12 +562,14 @@ class Processador {
 
             while (true) {
                 registradorIFID = instructionFeatch();
+
                 /* Parar de executar a hora que buscar uma instrução e nao achar nada */
-                if (registradorIFID.none()) {
+                if (registradorIFID.all()) {
                     break;
                 }
 
                 registradorIDEX = instructionDecoder(registradorIFID);
+
                 registradorMEMWB = execMemoria(registradorIDEX);
 
                 if (!registradorMEMWB.first.none()) {

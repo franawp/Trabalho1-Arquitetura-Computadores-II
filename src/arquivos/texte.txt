@@ -1,1 +1,7 @@
-add R1, R2, R3
+addi R1, R0, 10
+
+
+#load R1, R3
+#store R1, R3
+
+halt

@@ -56,9 +56,9 @@ class Interpretador {
             if (tipoInstrucao == "R") {
                 if (instrucao.size() == 4) {
                     bitset<8> opcode(hashOpcode[instrucao[0]]);
-                    bitset<8> ra(stoi(instrucao[1]));
-                    bitset<8> rb(stoi(instrucao[2]));
-                    bitset<8> rc(stoi(instrucao[3]));
+                    bitset<8> rc(stoi(instrucao[1]));
+                    bitset<8> ra(stoi(instrucao[2]));
+                    bitset<8> rb(stoi(instrucao[3]));
 
                     for (int i=7; i>=0; i--) {
                         binario[i+24] = opcode[i];
@@ -70,9 +70,9 @@ class Interpretador {
 
                 else if (instrucao.size() == 3) {
                     bitset<8> opcode(hashOpcode[instrucao[0]]);
-                    bitset<8> ra(stoi(instrucao[2]));
+                    bitset<8> rc(stoi(instrucao[2]));
                     bitset<8> rb(0b0);
-                    bitset<8> rc(stoi(instrucao[1]));
+                    bitset<8> ra(stoi(instrucao[1]));
 
                     for (int i=7; i>=0; i--) {
                         binario[i+24] = opcode[i];
@@ -94,6 +94,10 @@ class Interpretador {
                         binario[i+8] = rb[i];
                         binario[i] = rc[i];
                     }
+                }
+
+                else {
+                    binario = 0b11111111111111111111111111111111;
                 }
             }
 

@@ -21,6 +21,11 @@ class Memoria {
         }
 
         ~Memoria () {
+            cout << "bancoRegistradores: \n";
+            for (int i=0; i<32; i++) {
+                cout << i << " " << bancoRegistradores[i].to_ulong() << endl;
+            }
+
             delete[]memoriaInstrucoes;
             delete[]bancoRegistradores;
             delete[]memoriaDados;
