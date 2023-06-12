@@ -17,7 +17,7 @@ class Interpretador {
             /* Adicionando as instrucoes splitadas no vetor */
             while (splitador >> auxiliar) {
                 /* removendo os R e , das instrucoes */
-                for (int i=0; i<auxiliar.size(); i++) {
+                for (unsigned i=0; i<unsigned(auxiliar.size()); i++) {
                     if (auxiliar[i] == 'R' || auxiliar[i] == ',') {
                         auxiliar.erase(next(auxiliar.begin(),i));
                     }
@@ -105,8 +105,8 @@ class Interpretador {
 
             else if (tipoInstrucao == "I") {
                 bitset<8> opcode(hashOpcode[instrucao[0]]);
-                bitset<16> rb(instrucao[2]);
-                bitset<8> rc(instrucao[1]);
+                bitset<16> rb(stoi(instrucao[2]));
+                bitset<8> rc(stoi(instrucao[1]));
                 
                 for (int i=7; i>=0; i--) {
                     binario[i+24] = opcode[i];
@@ -119,16 +119,21 @@ class Interpretador {
             
             else if (tipoInstrucao == "J") {
                 bitset<8> opcode(hashOpcode[instrucao[0]]);
-                bitset<24> adress(instrucao[1]);
+                bitset<24> addres(stoi(instrucao[1]));
                 
                 for (int i=7; i>=0; i--) {
                     binario[i+24] = opcode[i];
                 }
                 for (int i=24; i>=0; i--) {
-                    binario[i] = adress[i];
+                    binario[i] = addres[i];
                 }
             }
-        
+
+            else if (tipoInstrucao == "H") {
+                bitset<32> halt (0b11111111111111111111111111111111);
+                binario = halt;
+            }
+
             return binario;
         }
     
@@ -165,7 +170,7 @@ class Interpretador {
 };
 
 map<string,bitset<8>> Interpretador::hashOpcode = {
-    {"adress", 0b00000000},
+    {"address", 0b00000000},
     {"add", 0b00000001},
     {"sub", 0b00000010},
     {"zeros", 0b00000011},
@@ -199,7 +204,7 @@ map<string,bitset<8>> Interpretador::hashOpcode = {
     {"halt", 0b11111111}
 };
 map <string,string> Interpretador ::hashTipo = {
-    {"adress","E"},  //Address
+    {"address","J"},  //Address
     {"add","R"}, //Add
     {"sub","R"}, //Sub
     {"zeros","R"}, //Zera
@@ -230,5 +235,5 @@ map <string,string> Interpretador ::hashTipo = {
     {"subi","R"}, //subi
     {"andi","R"}, //andi
     {"ori","R"}, //ori
-    {"halt","J"}  //halt
+    {"halt","H"}  //halt
 };

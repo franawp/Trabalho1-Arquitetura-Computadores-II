@@ -102,7 +102,6 @@ class Processador {
             }
 
             else if (tipo.second == "constante") {
-                cout << "registradores: " << registradorIDEX.numeroRegistradorA << endl; 
                 return operacaoConstante (registradorIDEX, tipo.first);
             }
 
@@ -177,6 +176,8 @@ class Processador {
                 bitset<32> conteudoRegistradorA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
                 return {registradorIDEX.numeroRegistradorC,conteudoRegistradorA};
             }
+
+            return {0b0,0b0};
         }
 
         pair<bitset<8>,bitset<32>> operacaoLogica (Sextupla registradorIDEX, string tipo) {
@@ -227,6 +228,8 @@ class Processador {
 
                 return {registradorIDEX.numeroRegistradorC,~(valorDeA | valorDeB)};
             }
+
+            return {0b0,0b0};
         }
 
         pair<bitset<8>,bitset<32>> operacaoBranch (Sextupla registradorIDEX, string tipo) {
@@ -283,15 +286,11 @@ class Processador {
                 bitset<32> valorDeB = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
                 bitset<32> valorDeC = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorC.to_ulong()); //endereço
 
-                bool ehMaior; //Caso queira saber se é maior ou não, ou tratar essa informação
-
                 for (int i = valorDeA.size()-1; i >= 0; i--) {
                     if (valorDeA[i] < valorDeB[i]) {
-                        ehMaior = true;
                         atualizarContadorPc(valorDeC.to_ulong());
                         break;
                     } else if (valorDeA[i] > valorDeB[i]) {
-                        ehMaior = false;
                         break;
                     }
                 }
@@ -304,21 +303,20 @@ class Processador {
                 bitset<32> valorDeB = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorB.to_ulong());
                 bitset<32> valorDeC = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorC.to_ulong()); //endereço
 
-                bool ehMaior; //Caso queira saber se é maior ou não, ou tratar essa informação
 
                 for (int i = valorDeA.size()-1; i >= 0; i--) {
                     if (valorDeA[i] > valorDeB[i]) {
-                        ehMaior = false;
                         atualizarContadorPc(valorDeC.to_ulong());
                         break;
                     } else if (valorDeA[i] < valorDeB[i]) {
-                        ehMaior = true;
                         break;
                     }
                 }
                 
                 return {0b0, 0b0};
             }
+
+            return {0b0,0b0};
         }
 
         pair<bitset<8>,bitset<32>> operacaoShift (Sextupla registradorIDEX, string tipo) {
@@ -336,7 +334,7 @@ class Processador {
 
                 bitset<32> novoValor (valorA >> valorB.to_ullong());
 
-                for (int i=31, j=0; j<valorB.to_ulong(); j++, i--) {
+                for (unsigned long i=31, j=0; j<valorB.to_ulong(); j++, i--) {
                     novoValor[i] = ultimoBit;
                 }
 
@@ -356,6 +354,8 @@ class Processador {
 
                 return {registradorIDEX.numeroRegistradorC, valorA >> valorB.to_ulong()};
             }
+
+            return {0b0,0b0};
         }
 
         pair<bitset<8>,bitset<32>> operacaoConstante (Sextupla registradorIDEX, string tipo) {
@@ -381,9 +381,8 @@ class Processador {
 
             else if (tipo == "addi") {
                 bitset<32> constante (registradorIDEX.numeroRegistradorB.to_ulong());
-                cout << "constante: " << constante << endl;
                 bitset<32> valorA = memoriaProcessador->getValorRegistrador(registradorIDEX.numeroRegistradorA.to_ulong());
-                cout << "valor a: " << valorA << endl;
+
                 return {registradorIDEX.numeroRegistradorC, somaBinaria(valorA,constante).second};
             }
 
@@ -408,9 +407,7 @@ class Processador {
                 return {registradorIDEX.numeroRegistradorC,(valorDeA | constante)};
             }
 
-            else {
-                cout << "nao me acharo :(" << endl;
-            }
+            return {0b0,0b0};
         }
 
         pair<string,string> tipoInstrucao (unsigned opcode) {
@@ -489,7 +486,7 @@ class Processador {
                 {0b00011100,"R"}, //subi
                 {0b00011101,"R"}, //andi
                 {0b00011110,"R"}, //ori
-                {0b11111111,"J"}  //halt
+                {0b11111111,"H"}  //halt
             };
 
 
