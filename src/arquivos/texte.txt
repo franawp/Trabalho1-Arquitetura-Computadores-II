@@ -1,6 +1,9 @@
+adress 0
 addi R1, R0, 10
+j 200
 
-
+adress 200
+addi R1, R0, 25
 #load R1, R3
 #store R1, R3
 

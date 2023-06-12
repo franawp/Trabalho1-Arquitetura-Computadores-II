@@ -4,6 +4,7 @@ using namespace std;
 class Interpretador {
     private:
         static map<string,bitset<8>> hashOpcode;
+        static map <string,string> hashTipo;
 
         static vector<string> splitar (string instrucao) {
             /* Variaveis auxiliares */
@@ -33,7 +34,8 @@ class Interpretador {
 
         static string qTipoInstrucao (vector<string> instrucao) {
             /* nao está pronto */
-            return "R";
+            return hashTipo[instrucao[0]];
+            
         }
 
         static bitset<32> gerarBinario (vector<string> instrucao) {
@@ -195,4 +197,38 @@ map<string,bitset<8>> Interpretador::hashOpcode = {
     {"andi", 0b00011101},
     {"ori", 0b00011110},
     {"halt", 0b11111111}
+};
+map <string,string> Interpretador ::hashTipo = {
+    {"adress","E"},  //Address
+    {"add","R"}, //Add
+    {"sub","R"}, //Sub
+    {"zeros","R"}, //Zera
+    {"xor","R"}, //Xor
+    {"or","R"}, //Or
+    {"passnota","R"}, //Not
+    {"and","R"}, //And
+    {"asl","R"}, //Shift left
+    {"asr","R"}, //Shift Right
+    {"lsl","R"}, //Shift Logico Left
+    {"lsr","R"}, //Shift Logico Right
+    {"passa","R"}, //Copia ....
+    {"lch","I"}, //lch
+    {"lcl","I"}, //lcl
+    {"load","R"}, //Load
+    {"store","R"}, //Store
+    {"jal","J"}, //jal
+    {"jr","R"}, //Jr
+    {"beq","R"}, //Beq
+    {"bne","R"}, //Bne
+    {"j","J"}, //J
+    {"bgt","R"}, //bgt
+    {"blt","R"}, //blt
+    {"nand","R"}, //nand
+    {"nor","R"}, //nor
+    {"xnor","R"}, //xnor
+    {"addi","R"}, //addi
+    {"subi","R"}, //subi
+    {"andi","R"}, //andi
+    {"ori","R"}, //ori
+    {"halt","J"}  //halt
 };

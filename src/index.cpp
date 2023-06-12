@@ -83,7 +83,6 @@ vector<string> abrirArquivo () {
 int main () {
     vector<string> listaInstrucoes = abrirArquivo();
     vector<pair<unsigned,bitset<32>>> instrucoes = Interpretador::interpretarInstrucoes(listaInstrucoes);
-
     Processador *processadorUFLA_RISC;
     processadorUFLA_RISC = new Processador(instrucoes);
 
