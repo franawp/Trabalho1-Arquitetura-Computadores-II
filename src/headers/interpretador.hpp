@@ -103,6 +103,20 @@ class Interpretador {
                 }
             }
 
+            else if (tipoInstrucao == "RB") {
+                bitset<8> opcode(hashOpcode[instrucao[0]]);
+                bitset<8> rc(stoi(instrucao[3]));
+                bitset<8> ra(stoi(instrucao[1]));
+                bitset<8> rb(stoi(instrucao[2]));
+
+                for (int i=7; i>=0; i--) {
+                    binario[i+24] = opcode[i];
+                    binario[i+16] = ra[i];
+                    binario[i+8] = rb[i];
+                    binario[i] = rc[i];
+                }
+            }
+
             else if (tipoInstrucao == "I") {
                 bitset<8> opcode(hashOpcode[instrucao[0]]);
                 bitset<16> rb(stoi(instrucao[2]));
@@ -223,11 +237,11 @@ map <string,string> Interpretador ::hashTipo = {
     {"store","R"}, //Store
     {"jal","J"}, //jal
     {"jr","R"}, //Jr
-    {"beq","R"}, //Beq
-    {"bne","R"}, //Bne
+    {"beq","RB"}, //Beq
+    {"bne","RB"}, //Bne
     {"j","J"}, //J
-    {"bgt","R"}, //bgt
-    {"blt","R"}, //blt
+    {"bgt","RB"}, //bgt
+    {"blt","RB"}, //blt
     {"nand","R"}, //nand
     {"nor","R"}, //nor
     {"xnor","R"}, //xnor

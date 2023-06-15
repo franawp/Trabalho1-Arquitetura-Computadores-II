@@ -21,11 +21,10 @@ class Memoria {
         }
 
         ~Memoria () {
-            /*
             cout << "dados: \n";
             for (int i=0; i<(64*1024); i++) {
                 if (memoriaDados[i].first) {
-                    cout << memoriaDados[i].second << endl;
+                    cout << i << " " << memoriaDados[i].second << endl;
                 }
             }
 
@@ -33,7 +32,6 @@ class Memoria {
             for (int i=0; i<32; i++) {
                 cout << i << " " << bancoRegistradores[i].to_ulong() << endl;
             }
-            */
 
             delete[]memoriaInstrucoes;
             delete[]bancoRegistradores;

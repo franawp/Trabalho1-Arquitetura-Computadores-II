@@ -1,13 +1,17 @@
 address 0
-addi R1, R0, 57
-addi R2, R0, 2
-store R1, R2
-
-j 200
+lcl R2, 123
+andi R3, R2, 64
 
 halt
 
-address 200
-load R4, R2
 
-halt
+
+
+
+
+
+#passnota  (Invertido)
+#passa (Está invertido)
+#lch NAO
+#load 
+#store (Está Invertido )

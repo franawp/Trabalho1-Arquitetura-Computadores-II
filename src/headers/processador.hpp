@@ -78,6 +78,30 @@ class Processador {
                 registradores.dadoRegistradorA = memoriaProcessador->getValorRegistrador(numeroRegistradorA.to_ulong());
             }
 
+            else if (tipo == "RB") {
+                for (int i=7; i>=0; i--) {
+                    numeroRegistradorA[i] = instrucao[i + 16];
+                    numeroRegistradorB[i] = instrucao[i + 8];
+                    registradores.imediate[i] = instrucao[i];
+                }
+
+                registradores.dadoRegistradorA = memoriaProcessador->getValorRegistrador(numeroRegistradorA.to_ulong());
+                registradores.dadoRegistradorB = memoriaProcessador->getValorRegistrador(numeroRegistradorB.to_ulong());
+
+                cout <<  numeroRegistradorA.to_ulong() << endl;
+                cout <<  numeroRegistradorB.to_ulong() << endl;
+            }
+
+            else if (tipo == "RM") {
+                for (int i=7; i>=0; i--) {
+                    numeroRegistradorA[i] = instrucao[i + 16];
+                    registradores.numeroRegistradorC[i] = instrucao[i];
+                }
+
+                registradores.dadoRegistradorA = memoriaProcessador->getValorRegistrador(numeroRegistradorA.to_ulong());
+                registradores.dadoRegistradorC = memoriaProcessador->getValorRegistrador(registradores.numeroRegistradorC.to_ulong());
+            }
+
             else if (tipo == "R2") {
                 for (int i=7; i>=0; i--) {
                     numeroRegistradorA[i] = instrucao[i + 16];
@@ -170,7 +194,7 @@ class Processador {
 
             else if (tipo == "store") {
                 bitset<16> dado (registradorIDEX.dadoRegistradorA.to_ulong());
-                memoriaProcessador->escritaMemoriaDados(dado,registradorIDEX.numeroRegistradorC.to_ulong());
+                memoriaProcessador->escritaMemoriaDados(dado,registradorIDEX.dadoRegistradorC.to_ulong());
 
                 return {0b0, 0b0};
             }
@@ -265,8 +289,13 @@ class Processador {
             else if (tipo == "beq") {
                 bitset<32> zero(0b0);
 
-                if (subtracaoBinaria(registradorIDEX.dadoRegistradorA, registradorIDEX.dadoRegistradorB).second == zero) {
-                    atualizarContadorPc (registradorIDEX.dadoRegistradorC.to_ulong());
+                cout << registradorIDEX.dadoRegistradorA.to_ulong() << " " << registradorIDEX.dadoRegistradorB.to_ulong() << endl;
+
+                cout << subtracaoBinaria(registradorIDEX.dadoRegistradorA, registradorIDEX.dadoRegistradorB).second << endl;
+
+                if (subtracaoBinaria(registradorIDEX.dadoRegistradorA, registradorIDEX.dadoRegistradorB).second.none()) {
+                    cout << "saltei para: " << registradorIDEX.imediate.to_ulong() << endl;
+                    atualizarContadorPc (registradorIDEX.imediate.to_ulong());
                 }
 
                 return {0b0,0b0};
@@ -275,14 +304,16 @@ class Processador {
             else if (tipo == "bne") {
                 bitset<32> zero(0b0);
 
-                if (subtracaoBinaria(registradorIDEX.dadoRegistradorA, registradorIDEX.dadoRegistradorB).second != zero) {
-                    atualizarContadorPc (registradorIDEX.dadoRegistradorC.to_ulong());
+                if (!subtracaoBinaria(registradorIDEX.dadoRegistradorA, registradorIDEX.dadoRegistradorB).second.none()) {
+                    cout << "diferente de 0" << endl;
+                    atualizarContadorPc (registradorIDEX.imediate.to_ulong());
                 }
 
                 return {0b0,0b0};
             }
 
             else if (tipo == "j") {
+                cout << "saltei" << endl;
                 atualizarContadorPc(registradorIDEX.endereco.to_ulong());
 
                 return {0b0, 0b0};
@@ -324,9 +355,9 @@ class Processador {
                         break;
                     }
                 }
-                
-                return {0b0, 0b0};
             }
+
+            return {0b0, 0b0};
         }
 
         pair<bitset<8>,bitset<32>> operacaoShift (Septupla registradorIDEX, string tipo) {
@@ -453,8 +484,8 @@ class Processador {
                 {0b00001100,"R2"}, //Copia ....
                 {0b00001101,"I"}, //lch
                 {0b00001110,"I"}, //lcl
-                {0b00001111,"R2"}, //Load
-                {0b00010000,"R2"}, //Store
+                {0b00001111,"RM"}, //Load
+                {0b00010000,"RM"}, //Store
                 {0b00010001,"J"}, //jal
                 {0b00010010,"R1"}, //Jr
                 {0b00010011,"RB"}, //Beq
