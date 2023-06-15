@@ -1,12 +1,13 @@
 address 0
-addi R1, R0, 10
-addi R2, R0, 10
+addi R1, R0, 57
+addi R2, R0, 2
+store R1, R2
 
-bne R2, R1, 200
+j 200
 
 halt
 
 address 200
-addi R3, R0, 20
+load R4, R2
 
 halt
