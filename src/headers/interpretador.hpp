@@ -72,9 +72,9 @@ class Interpretador {
 
                 else if (instrucao.size() == 3) {
                     bitset<8> opcode(hashOpcode[instrucao[0]]);
-                    bitset<8> rc(stoi(instrucao[2]));
+                    bitset<8> rc(stoi(instrucao[1]));
                     bitset<8> rb(0b0);
-                    bitset<8> ra(stoi(instrucao[1]));
+                    bitset<8> ra(stoi(instrucao[2]));
 
                     for (int i=7; i>=0; i--) {
                         binario[i+24] = opcode[i];
@@ -126,7 +126,7 @@ class Interpretador {
                     binario[i+24] = opcode[i];
                     binario[i] = rc[i];
                 }
-                for (int i=16; i>=0; i--) {
+                for (int i=15; i>=0; i--) {
                     binario[i+8] = rb[i];
                 }
             }
@@ -138,7 +138,8 @@ class Interpretador {
                 for (int i=7; i>=0; i--) {
                     binario[i+24] = opcode[i];
                 }
-                for (int i=24; i>=0; i--) {
+
+                for (int i=23; i>=0; i--) {
                     binario[i] = addres[i];
                 }
             }

@@ -32,18 +32,85 @@ class Processador {
 /* Atributos */
         Memoria *memoriaProcessador;
         unsigned contadorPC;
+/* Mapas */
+        map <unsigned,string> hashOpcode = {
+                {0b00000000,"E"},  //Address
+                {0b00000001,"R3"}, //Add
+                {0b00000010,"R3"}, //Sub
+                {0b00000011,"R1"}, //Zera
+                {0b00000100,"R3"}, //Xor
+                {0b00000101,"R3"}, //Or
+                {0b00000110,"R2"}, //Not
+                {0b00000111,"R3"}, //And
+                {0b00001000,"R3"}, //Shift left
+                {0b00001001,"R3"}, //Shift Right
+                {0b00001010,"R3"}, //Shift Logico Left
+                {0b00001011,"R3"}, //Shift Logico Right
+                {0b00001100,"R2"}, //Copia ....
+                {0b00001101,"I"}, //lch
+                {0b00001110,"I"}, //lcl
+                {0b00001111,"RM"}, //Load
+                {0b00010000,"RM"}, //Store
+                {0b00010001,"J"}, //jal
+                {0b00010010,"R1"}, //Jr
+                {0b00010011,"RB"}, //Beq
+                {0b00010100,"RB"}, //Bne
+                {0b00010101,"J"}, //J
+                {0b00010110,"RB"}, //bgt
+                {0b00010111,"RB"}, //blt
+                {0b00011000,"R3"}, //nand
+                {0b00011001,"R3"}, //nor
+                {0b00011010,"R3"}, //xnor
+                {0b00011011,"R3i"}, //addi
+                {0b00011100,"R3i"}, //subi
+                {0b00011101,"R3i"}, //andi
+                {0b00011110,"R3i"}, //ori
+                {0b11111111,"H"}  //halt
+            };
+        
+        map <unsigned,pair<string,string>> hashInstrucao = {
+                {0b00000000,{"address","label"}},
+                {0b00000001,{"add","aritmetica"}},
+                {0b00000010,{"sub","aritmetica"}},
+                {0b00000011,{"zeros","aritmetica"}},
+                {0b00000100,{"xor","logica"}},
+                {0b00000101,{"or","logica"}},
+                {0b00000110,{"passnota","logica"}},
+                {0b00000111,{"and","logica"}},
+                {0b00001000,{"asl","shift"}},
+                {0b00001001,{"asr","shift"}},
+                {0b00001010,{"lsl","shift"}},
+                {0b00001011,{"lsr","shift"}},
+                {0b00001100,{"passa","aritmetica"}},
+                {0b00001101,{"lch","constante"}},
+                {0b00001110,{"lcl","constante"}},
+                {0b00001111,{"load","memoria"}},
+                {0b00010000,{"store","memoria"}},
+                {0b00010001,{"jal","branch"}},
+                {0b00010010,{"jr","branch"}},
+                {0b00010011,{"beq","branch"}},
+                {0b00010100,{"bne","branch"}},
+                {0b00010101,{"j","branch"}},
+                {0b00010110,{"bgt","branch"}},
+                {0b00010111,{"blt","branch"}},
+                {0b00011000,{"nand","logica"}},
+                {0b00011001,{"nor","logica"}},
+                {0b00011010,{"xnor","logica"}},
+                {0b00011011,{"addi","constante"}},
+                {0b00011100,{"subi","constante"}},
+                {0b00011101,{"andi","constante"}},
+                {0b00011110,{"ori","contante"}},
+                {0b11111111,{"halt","abortar"}} 
+            };
 
 /* -- 4 Rotinas principais -- */
-        /* PRONTO */
         bitset<32> instructionFeatch () {
             bitset<32> instrucao = memoriaProcessador->getInstrucao(contadorPC);
             contadorPC++;
             return instrucao;
         }
 
-        /* PRONTO */
         Septupla instructionDecoder (bitset<32>instrucao) {
-            /* Variáveis */
             Septupla registradores;
             string tipo;
             bitset<8> numeroRegistradorA;
@@ -88,8 +155,6 @@ class Processador {
                 registradores.dadoRegistradorA = memoriaProcessador->getValorRegistrador(numeroRegistradorA.to_ulong());
                 registradores.dadoRegistradorB = memoriaProcessador->getValorRegistrador(numeroRegistradorB.to_ulong());
 
-                cout <<  numeroRegistradorA.to_ulong() << endl;
-                cout <<  numeroRegistradorB.to_ulong() << endl;
             }
 
             else if (tipo == "RM") {
@@ -127,10 +192,12 @@ class Processador {
                 for (int i=16; i>=0; i--) {
                     registradores.constante[i] = instrucao[i + 8];
                 }
+
+                registradores.dadoRegistradorC = memoriaProcessador->getValorRegistrador(registradores.numeroRegistradorC.to_ulong());
             }
 
             else if (tipo == "J") {
-                for (int i=24; i>=0; i--) {
+                for (int i=23; i>=0; i--) {
                     registradores.endereco[i] = instrucao[i];
                 }
             }
@@ -138,7 +205,6 @@ class Processador {
             return registradores;
         }
 
-        /* METADE PRONTO */
         pair<bitset<8>, bitset<32>> execMemoria (Septupla registradorIDEX) {
 
             pair<string,string> tipo = tipoInstrucao(registradorIDEX.opcode.to_ulong());
@@ -205,7 +271,7 @@ class Processador {
         pair<bitset<8>,bitset<32>> operacaoAritmetica (Septupla registradorIDEX, string tipo) {
             if (tipo == "add") {
                 pair<bool,bitset<32>> soma = somaBinaria(registradorIDEX.dadoRegistradorA,registradorIDEX.dadoRegistradorB);
-                
+
                 if (soma.first) {
                     /* flag de overflow */
                 }
@@ -289,12 +355,7 @@ class Processador {
             else if (tipo == "beq") {
                 bitset<32> zero(0b0);
 
-                cout << registradorIDEX.dadoRegistradorA.to_ulong() << " " << registradorIDEX.dadoRegistradorB.to_ulong() << endl;
-
-                cout << subtracaoBinaria(registradorIDEX.dadoRegistradorA, registradorIDEX.dadoRegistradorB).second << endl;
-
                 if (subtracaoBinaria(registradorIDEX.dadoRegistradorA, registradorIDEX.dadoRegistradorB).second.none()) {
-                    cout << "saltei para: " << registradorIDEX.imediate.to_ulong() << endl;
                     atualizarContadorPc (registradorIDEX.imediate.to_ulong());
                 }
 
@@ -305,7 +366,6 @@ class Processador {
                 bitset<32> zero(0b0);
 
                 if (!subtracaoBinaria(registradorIDEX.dadoRegistradorA, registradorIDEX.dadoRegistradorB).second.none()) {
-                    cout << "diferente de 0" << endl;
                     atualizarContadorPc (registradorIDEX.imediate.to_ulong());
                 }
 
@@ -313,7 +373,6 @@ class Processador {
             }
 
             else if (tipo == "j") {
-                cout << "saltei" << endl;
                 atualizarContadorPc(registradorIDEX.endereco.to_ulong());
 
                 return {0b0, 0b0};
@@ -321,17 +380,8 @@ class Processador {
 
             else if (tipo == "bgt") {
                 for (int i=31; i >= 0; i--) {
-                    if (registradorIDEX.dadoRegistradorA[i] && !registradorIDEX.dadoRegistradorB[i]) {
+                    if (registradorIDEX.dadoRegistradorA[i] & !registradorIDEX.dadoRegistradorB[i]) {
                         atualizarContadorPc(registradorIDEX.dadoRegistradorC.to_ulong());
-                        break;
-                    } 
-                    
-                    else if ((registradorIDEX.dadoRegistradorA[i] && registradorIDEX.dadoRegistradorB[i]) || 
-                            (!registradorIDEX.dadoRegistradorA[i] && !registradorIDEX.dadoRegistradorB[i])) {
-                        continue;
-                    }
-                    
-                    else {
                         break;
                     }
                 }
@@ -356,7 +406,6 @@ class Processador {
                     }
                 }
             }
-
             return {0b0, 0b0};
         }
 
@@ -390,9 +439,10 @@ class Processador {
 
         pair<bitset<8>,bitset<32>> operacaoConstante (Septupla registradorIDEX, string tipo) {
             if (tipo == "lch") {
-                bitset<32> valor (registradorIDEX.constante.to_ulong());
+                bitset<32> bits16(0x0000ffff); 
+                bitset<32> constante (registradorIDEX.constante.to_ulong());
 
-                return {registradorIDEX.numeroRegistradorC, valor};
+                return {registradorIDEX.numeroRegistradorC, (constante << 16) | (registradorIDEX.dadoRegistradorC & bits16)};
             }
 
             else if (tipo == "lcl") {
@@ -425,41 +475,6 @@ class Processador {
         }
 
         pair<string,string> tipoInstrucao (unsigned opcode) {
-            map <unsigned,pair<string,string>> hashInstrucao = {
-                {0b00000000,{"address","label"}},
-                {0b00000001,{"add","aritmetica"}},
-                {0b00000010,{"sub","aritmetica"}},
-                {0b00000011,{"zeros","aritmetica"}},
-                {0b00000100,{"xor","logica"}},
-                {0b00000101,{"or","logica"}},
-                {0b00000110,{"passnota","logica"}},
-                {0b00000111,{"and","logica"}},
-                {0b00001000,{"asl","shift"}},
-                {0b00001001,{"asr","shift"}},
-                {0b00001010,{"lsl","shift"}},
-                {0b00001011,{"lsr","shift"}},
-                {0b00001100,{"passa","aritmetica"}},
-                {0b00001101,{"lch","constante"}},
-                {0b00001110,{"lcl","constante"}},
-                {0b00001111,{"load","memoria"}},
-                {0b00010000,{"store","memoria"}},
-                {0b00010001,{"jal","branch"}},
-                {0b00010010,{"jr","branch"}},
-                {0b00010011,{"beq","branch"}},
-                {0b00010100,{"bne","branch"}},
-                {0b00010101,{"j","branch"}},
-                {0b00010110,{"bgt","branch"}},
-                {0b00010111,{"blt","branch"}},
-                {0b00011000,{"nand","logica"}},
-                {0b00011001,{"nor","logica"}},
-                {0b00011010,{"xnor","logica"}},
-                {0b00011011,{"addi","constante"}},
-                {0b00011100,{"subi","constante"}},
-                {0b00011101,{"andi","constante"}},
-                {0b00011110,{"ori","contante"}},
-                {0b11111111,{"halt","abortar"}} 
-            };
-
             if (hashInstrucao.find(opcode) == hashInstrucao.end()) {
                 return {"",""};
             }
@@ -468,42 +483,6 @@ class Processador {
         }
 
         string formatoInstrucao (unsigned opcode) {
-            map <unsigned,string> hashOpcode = {
-                {0b00000000,"E"},  //Address
-                {0b00000001,"R3"}, //Add
-                {0b00000010,"R3"}, //Sub
-                {0b00000011,"R1"}, //Zera
-                {0b00000100,"R3"}, //Xor
-                {0b00000101,"R3"}, //Or
-                {0b00000110,"R2"}, //Not
-                {0b00000111,"R3"}, //And
-                {0b00001000,"R3"}, //Shift left
-                {0b00001001,"R3"}, //Shift Right
-                {0b00001010,"R3"}, //Shift Logico Left
-                {0b00001011,"R3"}, //Shift Logico Right
-                {0b00001100,"R2"}, //Copia ....
-                {0b00001101,"I"}, //lch
-                {0b00001110,"I"}, //lcl
-                {0b00001111,"RM"}, //Load
-                {0b00010000,"RM"}, //Store
-                {0b00010001,"J"}, //jal
-                {0b00010010,"R1"}, //Jr
-                {0b00010011,"RB"}, //Beq
-                {0b00010100,"RB"}, //Bne
-                {0b00010101,"J"}, //J
-                {0b00010110,"RB"}, //bgt
-                {0b00010111,"RB"}, //blt
-                {0b00011000,"R3"}, //nand
-                {0b00011001,"R3"}, //nor
-                {0b00011010,"R3"}, //xnor
-                {0b00011011,"R3i"}, //addi
-                {0b00011100,"R3i"}, //subi
-                {0b00011101,"R3i"}, //andi
-                {0b00011110,"R3i"}, //ori
-                {0b11111111,"H"}  //halt
-            };
-
-
             if (hashOpcode.find(opcode) == hashOpcode.end()) {
                 return "X";
             }

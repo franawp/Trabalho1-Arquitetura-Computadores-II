@@ -1,17 +1,13 @@
-address 0
-lcl R2, 123
-andi R3, R2, 64
+address 0  # o começo da memória de texto começa na posição 12182
+lcl R1, 10
+lcl R2, 0
+
+address 25
+beq R1, R2, 40
+addi R2, R2, 1
+j 25
+
+address 40
+
 
 halt
-
-
-
-
-
-
-
-#passnota  (Invertido)
-#passa (Está invertido)
-#lch NAO
-#load 
-#store (Está Invertido )

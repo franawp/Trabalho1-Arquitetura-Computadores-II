@@ -30,7 +30,7 @@ class Memoria {
 
             cout << "bancoRegistradores: \n";
             for (int i=0; i<32; i++) {
-                cout << i << " " << bancoRegistradores[i].to_ulong() << endl;
+                cout << i << " " << bancoRegistradores[i] << endl;
             }
 
             delete[]memoriaInstrucoes;
@@ -59,6 +59,10 @@ class Memoria {
 
 /* -- Métodos que envolvem o banco de registradores --*/
         void escritaBancoRegistradores (bitset<32> dado, unsigned numeroRegistrador) {
+            if (numeroRegistrador == 0) {
+                cout << "Nao pode escrever no 0!" << endl;
+                return;
+            }
             bancoRegistradores[numeroRegistrador] = dado;
         }
 
